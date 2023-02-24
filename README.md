@@ -1,57 +1,45 @@
-# Modernisation Platform Terraform Module Template 
+# `ec2_instance` module
 
-[![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=for-the-badge&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fmodernisation-platform-terraform-module-template)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#modernisation-platform-terraform-module-template "Link to report")
+Terraform module for standing up a single EC2 instance
 
-## Usage
+## EBS Volumes
 
-```hcl
+If you specify nothing, the volumes will be derived from those in the AMI image
+and will be created as a separate resource to allow easy resizing.
 
-module "template" {
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-module-template"
-
-  tags             = local.tags
-  application_name = local.application_name
-
-}
+You can optionally assign a "label" to the volume to make the volumes easy
+to identify, e.g.
 
 ```
-<!--- BEGIN_TF_DOCS --->
+ebs_volumes = {
+  "/dev/sde" = { label = "data" }  # DATA01
+  "/dev/sdf" = { label = "data" }  # DATA02
+}
+```
 
+The label will then be included in the tag:Name. You can also override the
+default AMI settings. If all the volumes with the same label have the same
+settings, set like this:
 
-<!--- END_TF_DOCS --->
+```
+ebs_volume_config = {
+  data = {
+    iops       = 3000
+    throughput = 125
+    total_size = 200
+  }
+}
+```
 
-## Looking for issues?
-If you're looking to raise an issue with this module, please create a new issue in the [Modernisation Platform repository](https://github.com/ministryofjustice/modernisation-platform/issues).
+The size of each volume is `total_size` divided by the number of volumes with that label.
 
-<!-- BEGIN_TF_DOCS -->
-## Requirements
+Alternatively, override settings directly within the `ebs_volumes` variable.
 
-| Name | Version |
-|------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.0 |
+```
+ebs_volumes = {
+  "/dev/sde" = { size = 100 }
+  "/dev/sdf" = { size = 150 }
+}
+```
 
-## Providers
-
-No providers.
-
-## Modules
-
-No modules.
-
-## Resources
-
-No resources.
-
-## Inputs
-
-| Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
-| <a name="input_application_name"></a> [application\_name](#input\_application\_name) | Name of application | `string` | n/a | yes |
-| <a name="input_tags"></a> [tags](#input\_tags) | Common tags to be used by all resources | `map(string)` | n/a | yes |
-
-## Outputs
-
-No outputs.
-<!-- END_TF_DOCS -->
+See `environments/nomis` for usage examples.
