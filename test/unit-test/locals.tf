@@ -35,4 +35,56 @@ locals {
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
+  ec2_test = {
+
+    # server-type and nomis-environment auto set by module
+    tags = {
+      component = "test"
+    }
+
+    instance = {
+      disable_api_termination      = false
+      instance_type                = "t3.medium"
+      key_name                     = ""
+      monitoring                   = false
+      metadata_options_http_tokens = "required"
+      vpc_security_group_ids       = [aws_security_group.test.id]
+    }
+
+    user_data_cloud_init = {
+      args = {
+        lifecycle_hook_name  = "ready-hook"
+        branch               = "main"
+        ansible_repo         = "modernisation-platform-configuration-management"
+        ansible_repo_basedir = "ansible"
+        ansible_args         = "--tags ec2provision"
+      }
+      scripts = [
+        "install-ssm-agent.sh.tftpl",
+        "ansible-ec2provision.sh.tftpl",
+        "post-ec2provision.sh.tftpl"
+      ]
+    }
+    ebs_volume_config = {
+          data  = { total_size = 100 }
+          flash = { total_size = 50 }
+        }
+    ebs_volumes = {
+          "/dev/sdb" = { size = 100 }
+          "/dev/sdc" = { size = 100 }
+        }
+
+    route53_records = {
+      create_internal_record = true
+      create_external_record = false
+    }
+
+    # user can manually increase the desired capacity to 1 via CLI/console
+    # to create an instance
+    autoscaling_group = {
+      desired_capacity = 0
+      max_size         = 2
+      min_size         = 0
+    }
+  }
 }

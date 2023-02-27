@@ -1,3 +1,3 @@
 output "example" {
-  value = module.module_test.name
+  value = module.module_test.aws_instance
 }
