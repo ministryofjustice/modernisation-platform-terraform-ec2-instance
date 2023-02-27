@@ -66,13 +66,13 @@ locals {
       ]
     }
     ebs_volume_config = {
-          data  = { total_size = 100 }
-          flash = { total_size = 50 }
-        }
+      data  = { total_size = 100 }
+      flash = { total_size = 50 }
+    }
     ebs_volumes = {
-          "/dev/sdb" = { size = 100 }
-          "/dev/sdc" = { size = 100 }
-        }
+      "/dev/sdb" = { size = 100 }
+      "/dev/sdc" = { size = 100 }
+    }
 
     route53_records = {
       create_internal_record = true
