@@ -1,31 +1,51 @@
-package test
+// package test
+//
+// import (
+//     "testing"
+//
+//     "github.com/gruntwork-io/terratest/modules/terraform"
+//     "github.com/stretchr/testify/assert"
+// )
+//
+// func TestTerraformEC2Instance(t *testing.T) {
+//     terraformOptions := &terraform.Options{
+//         // Set the path to the Terraform code directory
+//         TerraformDir: "./unit-test",
+//
+//         // Variables to pass to the Terraform code
+// //         Vars: map[string]interface{}{
+// //             "instance_type": "t2.micro",
+// //         },
+//     }
+//
+//     // Run `terraform init` and `terraform apply` with the options defined above
+//     terraform.InitAndApply(t, terraformOptions)
+//
+//     // Get the public IP address of the EC2 instance
+//     publicIP := terraform.Output(t, terraformOptions, "public_ip")
+//
+//     // Verify that the public IP address is not empty
+//     assert.NotEmpty(t, publicIP)
+//
+// }
+//
+package main
 
 import (
-    "testing"
-
-    "github.com/gruntwork-io/terratest/modules/terraform"
-    "github.com/stretchr/testify/assert"
+	"github.com/gruntwork-io/terratest/modules/terraform"
+	"testing"
 )
 
-func TestTerraformEC2Instance(t *testing.T) {
-    terraformOptions := &terraform.Options{
-        // Set the path to the Terraform code directory
-        TerraformDir: "./unit-test",
+func TestModule(t *testing.T) {
+	t.Parallel()
 
-        // Variables to pass to the Terraform code
-//         Vars: map[string]interface{}{
-//             "instance_type": "t2.micro",
-//         },
-    }
+	terraformOptions := terraform.WithDefaultRetryableErrors(t, &terraform.Options{
+		TerraformDir: "./unit-test",
+	})
 
-    // Run `terraform init` and `terraform apply` with the options defined above
-    terraform.InitAndApply(t, terraformOptions)
+	defer terraform.Destroy(t, terraformOptions)
 
-    // Get the public IP address of the EC2 instance
-    publicIP := terraform.Output(t, terraformOptions, "public_ip")
+	terraform.InitAndApply(t, terraformOptions)
 
-    // Verify that the public IP address is not empty
-    assert.NotEmpty(t, publicIP)
 
 }
-

@@ -71,9 +71,9 @@ variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
     associate_public_ip_address  = optional(bool, false)
-    disable_api_termination      = bool
-    instance_type                = string
-    key_name                     = string
+    disable_api_termination      = optional(bool, false)
+    instance_type                = optional(string, "t3.micro")
+    key_name                     = optional(string, "")
     metadata_endpoint_enabled    = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool, true)
