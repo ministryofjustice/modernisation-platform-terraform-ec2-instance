@@ -39,7 +39,7 @@ locals {
       }
     }
 
-    weblogics          = {}
+    weblogics = {}
     ec2_test_instances = {
       dev-redhat-rhel610 = {
         tags = {
@@ -116,8 +116,8 @@ locals {
 
 locals {
   # provider locals (don't change)
-  environment                       = "test"
-  environment_management            = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+  environment            = "test"
+  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
   business_unit       = var.networking[0].business-unit
   vpc_name            = var.networking[0].business-unit
@@ -127,9 +127,9 @@ locals {
   region              = "eu-west-2"
   availability_zone_1 = "eu-west-2a"
   availability_zone_2 = "eu-west-2b"
-  tags                = {
-      component = "test"
-    }
+  tags = {
+    component = "test"
+  }
 
 }
 

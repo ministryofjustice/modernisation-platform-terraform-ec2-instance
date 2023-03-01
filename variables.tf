@@ -66,7 +66,7 @@ variable "ami_owner" {
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"
-  default =   "Windows_Server-2016-English-Full-Base*"
+  default     = "Windows_Server-2016-English-Full-Base*"
 }
 
 variable "instance" {
