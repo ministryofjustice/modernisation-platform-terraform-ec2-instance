@@ -53,18 +53,20 @@ variable "account_ids_lookup" {
 variable "ami_name" {
   type        = string
   description = "Name of AMI to be used to launch the database ec2 instance"
+  default     = ""
 }
 
 variable "ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
-  default     = "self"
+  default     = "amazon"
   nullable    = false
 }
 
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"
+  default =   "Windows_Server-2016-English-Full-Base*"
 }
 
 variable "instance" {

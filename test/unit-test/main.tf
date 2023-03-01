@@ -6,10 +6,10 @@ module "module_test" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  ami_name          = "RHEL-6.10_HVM-*"
-  ebs_volume_config = local.ec2_test.ebs_volume_config
-  ebs_volumes       = local.ec2_test.ebs_volumes
-  environment       = "test"
+  ami_name          = local.testing-test.ec2_test_instances.dev-base-rhel79.ami_name
+  ebs_volume_config = local.testing-test.ebs_volume_config
+  ebs_volumes       = local.testing-test.ebs_volumes
+  environment       = local.environment
   instance = {
     disable_api_termination      = false
     instance_type                = "t3.medium"
