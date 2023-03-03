@@ -32,6 +32,7 @@ If you're looking to raise an issue with this module, please create a new issue 
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.9 |
 | <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | ~> 2.2.0 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | > 0.9.0 |
 
 ## Providers
@@ -41,7 +42,7 @@ If you're looking to raise an issue with this module, please create a new issue 
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.9 |
 | <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 4.9 |
 | <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | ~> 2.2.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | n/a |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.0 |
 | <a name="provider_time"></a> [time](#provider\_time) | > 0.9.0 |
 
 ## Modules
