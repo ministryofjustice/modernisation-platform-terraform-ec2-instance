@@ -32,7 +32,7 @@ If you're looking to raise an issue with this module, please create a new issue 
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 4.9 |
 | <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | ~> 2.2.0 |
-| <a name="requirement_random"></a> [random](#requirement\_random) | = 3.4.1 |
+| <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 | <a name="requirement_time"></a> [time](#requirement\_time) | > 0.9.0 |
 
 ## Providers
@@ -42,7 +42,7 @@ If you're looking to raise an issue with this module, please create a new issue 
 | <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 4.9 |
 | <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 4.9 |
 | <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | ~> 2.2.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | = 3.4.1 |
+| <a name="provider_random"></a> [random](#provider\_random) | ~> 3.0 |
 | <a name="provider_time"></a> [time](#provider\_time) | > 0.9.0 |
 
 ## Modules
@@ -65,7 +65,7 @@ No modules.
 | [aws_route53_record.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_ssm_parameter.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_volume_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/volume_attachment) | resource |
-| [random_password.this](https://registry.terraform.io/providers/hashicorp/random/3.4.1/docs/resources/password) | resource |
+| [random_password.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [time_offset.asm_parameter](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/offset) | resource |
 | [aws_ami.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
