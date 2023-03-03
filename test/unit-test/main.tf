@@ -6,7 +6,7 @@ module "module_test" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  ami_name          = local.testing-test.ec2_test_instances.dev-base-rhel79.ami_name
+  ami_name          = "RHEL-9.1.0_HVM-20221101-arm64-2-Hourly2-GP2"
   ebs_volume_config = local.testing-test.ebs_volume_config
   ebs_volumes       = local.testing-test.ebs_volumes
   environment       = local.environment
