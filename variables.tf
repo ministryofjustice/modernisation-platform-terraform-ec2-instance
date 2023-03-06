@@ -53,29 +53,27 @@ variable "account_ids_lookup" {
 variable "ami_name" {
   type        = string
   description = "Name of AMI to be used to launch the database ec2 instance"
-  default     = ""
 }
 
 variable "ami_owner" {
   type        = string
   description = "Owner of AMI to be used to launch the database ec2 instance"
-  default     = "amazon"
+  default     = "self"
   nullable    = false
 }
 
 variable "name" {
   type        = string
   description = "Provide a unique name for the instance"
-  default     = "Windows_Server-2016-English-Full-Base*"
 }
 
 variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
     associate_public_ip_address  = optional(bool, false)
-    disable_api_termination      = optional(bool, false)
-    instance_type                = optional(string, "t3.micro")
-    key_name                     = optional(string, "")
+    disable_api_termination      = bool
+    instance_type                = string
+    key_name                     = string
     metadata_endpoint_enabled    = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool, true)
