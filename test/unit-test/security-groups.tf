@@ -25,7 +25,8 @@ resource "aws_security_group" "test" {
 
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
-  tags = {
-    "Name" = "platforms-test-general-public-eu-west-2a"
+  filter {
+    name   = "tag:Name"
+    values = ["*platforms-test-general-private-eu-west-2a*"]
   }
 }
