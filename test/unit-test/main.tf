@@ -27,7 +27,7 @@ module "ec2_test_instance" {
   environment              = local.environment
   region                   = local.region
   availability_zone        = local.availability_zone_1
-  subnet_id                = data.aws_subnet.private_subnets_a.id 
+  subnet_id                = data.aws_subnet.private_subnets_a.id
   tags                     = merge(local.tags, local.ec2_test.tags, try(each.value.tags, {}))
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
