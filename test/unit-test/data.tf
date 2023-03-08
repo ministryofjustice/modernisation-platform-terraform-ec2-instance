@@ -9,14 +9,14 @@ data "aws_kms_key" "default_ebs" {
 }
 
 # combine ec2-common policy documents
-data "aws_iam_policy_document" "ec2_common_combined" {
+data "aws_iam_policy_document" "ec2_test_common_combined" {
   source_policy_documents = [
-    data.aws_iam_policy_document.ec2_policy.json,
+    data.aws_iam_policy_document.ec2_test_policy.json,
   ]
 }
 
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
-data "aws_iam_policy_document" "ec2_policy" {
+data "aws_iam_policy_document" "ec2_test_policy" {
   statement {
     #checkov:skip=CKV_AWS_109:
     #checkov:skip=CKV_AWS_111:
