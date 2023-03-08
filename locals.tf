@@ -105,15 +105,5 @@ locals {
     try(length(var.user_data_cloud_init.scripts), 0),
     try(length(var.user_data_cloud_init.write_files), 0)
   ]
-  ami_info = {
-    tags = {
-      description = "For testing official RedHat RHEL7.9 image"
-      monitored   = false
-      os-type     = "Linux"
-      component   = "test"
-    }
-    ami_name  = "RHEL-7.9_HVM-*"
-    ami_owner = "309956199498"
-  }
 }
 

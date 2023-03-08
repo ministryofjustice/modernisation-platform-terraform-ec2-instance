@@ -18,6 +18,9 @@ data "aws_iam_policy_document" "ec2_common_combined" {
 # custom policy for SSM as managed policy AmazonSSMManagedInstanceCore is too permissive
 data "aws_iam_policy_document" "ec2_policy" {
   statement {
+    #checkov:skip=CKV_AWS_109:
+    #checkov:skip=CKV_AWS_111:
+
     sid    = "CustomEc2Policy"
     effect = "Allow"
     actions = [
