@@ -126,10 +126,10 @@ resource "aws_ebs_volume" "this" {
   iops              = try(each.value.iops > 0, false) ? each.value.iops : null
   throughput        = try(each.value.throughput > 0, false) ? each.value.throughput : null
   size              = each.value.size
-  type              = coalesce(each.value.type, null)
+  type              = lookup(each.value, "type", null)
 
   # you may run into a permission issue if the AMI is not in self account
-  snapshot_id = coalesce(each.value.snapshot_id, null)
+  snapshot_id = lookup(each.value, "snapshot_id", null)
 
   tags = merge(
     local.tags,
