@@ -21,3 +21,8 @@ output "kms-key" {
   description = "KMS Key"
   value       = try(aws_iam_policy.ec2_test_common_policy.arn, "")
 }
+
+output "subnet-arn" {
+  description = "Subnet ARN"
+  value       = try(data.aws_subnet.private_subnets_a.arn, "")
+}

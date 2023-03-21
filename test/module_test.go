@@ -23,6 +23,7 @@ func TestModule(t *testing.T) {
 	iamPolicy := terraform.Output(t, terraformOptions, "iam-policy")
 	amiName := terraform.Output(t, terraformOptions, "ami-name")
 	kmsKey := terraform.Output(t, terraformOptions, "kms-key")
+    subnetID := terraform.Output(t, terraformOptions, "subnet-arn")
 
 
 	assert.NotEmpty(t, secGroupId)
@@ -30,6 +31,6 @@ func TestModule(t *testing.T) {
     assert.Regexp(t, regexp.MustCompile(`^arn:aws:iam:*`), iamPolicy)
     assert.Regexp(t, regexp.MustCompile(`^RHEL-7.9_HVM-*`), amiName)
     assert.Regexp(t, regexp.MustCompile(`^arn:aws:iam::836052629367:policy/*`), kmsKey)
-
+    assert.Regexp(t, regexp.MustCompile(`^arn:aws:ec2:eu-west-2*`), subnetID)
 
 }
