@@ -24,7 +24,7 @@ cd test/unit-test
 
 Run the tests from within the `test` directory using the `testing-test` user credentials.
 
-Get the crededtials from moj.awsapps.com
+Get the credentials from moj.awsapps.com
 
 ```
 cd modernisation-platform/scripts/internal/
