@@ -22,16 +22,14 @@ Initialise terraform workspace within the `test/unit-test` directory
 cd test/unit-test
 ```
 
-Run the tests from within the `test` directory using the `testing-ci` user credentials.
+Run the tests from within the `test` directory using the `testing-test` user credentials.
 
-Get the crededtials from secrets manager using the helper script in the modernisation-platform main repo.
+Get the crededtials from moj.awsapps.com
 
 ```
 cd modernisation-platform/scripts/internal/
 aws-vault exec mod -- go run get_testing_creds.go
 ```
-
-Copy the credentials from the output of the script and paste them into the terminal from which you will run the tests.
 
 Next go into the testing folder and run the tests.
 
