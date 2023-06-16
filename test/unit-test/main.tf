@@ -1,5 +1,5 @@
 module "ec2_test_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
+  source = "../../"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
