@@ -98,8 +98,8 @@ resource "aws_instance" "this" {
 
 resource "aws_eip" "this" {
   #checkov:skip=CKV2_AWS_19: "EIP attachment is handled through separate resource"
-  count = var.instance.associate_public_ip_address ? 1 : 0
-  vpc   = true
+  count  = var.instance.associate_public_ip_address ? 1 : 0
+  domain = "vpc"
   tags = merge(local.tags, {
     Name = var.name
   })
