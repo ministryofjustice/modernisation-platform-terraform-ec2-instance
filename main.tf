@@ -30,7 +30,7 @@ resource "aws_instance" "this" {
     volume_size           = local.ebs_volume_root.size
     volume_type           = local.ebs_volume_root.type
 
-    tags = merge(local.tags, {
+    tags = merge(local.tags, var.ebs_volume_tags, {
       Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
     })
   }
@@ -61,7 +61,7 @@ resource "aws_instance" "this" {
       volume_size = ebs_block_device.value.size
       volume_type = ebs_block_device.value.type
 
-      tags = merge(local.tags, {
+      tags = merge(local.tags, var.ebs_volume_tags, {
         Name = try(
           join("-", [var.name, ebs_block_device.value.label, ebs_block_device.key]),
           join("-", [var.name, ebs_block_device.key])
@@ -87,7 +87,7 @@ resource "aws_instance" "this" {
     ]
   }
 
-  tags = merge(local.tags, {
+  tags = merge(local.tags, var.instance.tags, {
     Name = var.name
   })
 }
@@ -131,15 +131,12 @@ resource "aws_ebs_volume" "this" {
   # you may run into a permission issue if the AMI is not in self account
   snapshot_id = lookup(each.value, "snapshot_id", null)
 
-  tags = merge(
-    local.tags,
-    {
-      Name = try(
-        join("-", [var.name, each.value.label, each.key]),
-        join("-", [var.name, each.key])
-      )
-    }
-  )
+  tags = merge(local.tags, var.ebs_volume_tags, {
+    Name = try(
+      join("-", [var.name, each.value.label, each.key]),
+      join("-", [var.name, each.key])
+    )
+  })
 
   lifecycle {
     ignore_changes = [snapshot_id] # retain data if AMI is updated. If you want to start from fresh, destroy it
@@ -192,6 +189,10 @@ resource "random_password" "this" {
 }
 
 resource "aws_ssm_parameter" "this" {
+  #checkov:skip=CKV_AWS_337: Ensure SSM parameters are using KMS CMK
+  # An AWS managed key is used at the moment.
+  # Fix ticket https://dsdmoj.atlassian.net/browse/DSOS-2011
+
   for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
