@@ -41,7 +41,7 @@ variable "subnet_id" {
 
 variable "tags" {
   type        = map(any)
-  description = "Default tags to be applied to resources.  Additional tags can be added to EBS volumes or EC2s, see instance.tag and ebs_volume_tags variables."
+  description = "Default tags to be applied to resources.  Additional tags can be added to EBS volumes or EC2s, see instance.tags and ebs_volume_tags variables."
 }
 
 variable "account_ids_lookup" {
