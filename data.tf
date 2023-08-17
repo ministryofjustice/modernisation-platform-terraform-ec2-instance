@@ -64,3 +64,17 @@ data "cloudinit_config" "this" {
     }
   }
 }
+
+data "aws_iam_policy_document" "asm_parameter" {
+  statement {
+    effect  = "Allow"
+    actions = ["ssm:GetParameter"]
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path, plus time conditional restricts access to short duration after launch
+    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+    condition {
+      test     = "DateLessThan"
+      variable = "aws:CurrentTime"
+      values   = [time_offset.asm_parameter.rfc3339]
+    }
+  }
+}
