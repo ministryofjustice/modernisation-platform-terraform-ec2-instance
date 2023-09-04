@@ -178,11 +178,15 @@ variable "ssm_parameters_prefix" {
 variable "ssm_parameters" {
   description = "A map of SSM parameters to create.  If parameters are manually created, set to {} so IAM role still created"
   type = map(object({
-    random = object({
+    description = optional(string)
+    type        = optional(string, "SecureString")
+    kms_key_id  = optional(string)
+    file        = optional(string)
+    random = optional(object({
       length  = number
-      special = bool
-    })
-    description = string
+      special = optional(bool)
+    }))
+    value = optional(string)
   }))
   default = null
 }

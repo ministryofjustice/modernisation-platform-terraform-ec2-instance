@@ -7,6 +7,33 @@ locals {
   }
   tags = merge(local.default_tags, local.ssm_parameters_prefix_tag, var.tags)
 
+  ssm_random_passwords = {
+    for key, value in var.ssm_parameters :
+    key => value.random if value.random != null
+  }
+  ssm_parameters_value = {
+    for key, value in var.ssm_parameters :
+    key => value if value.value != null
+  }
+  ssm_parameters_random = {
+    for key, value in var.ssm_parameterss :
+    key => merge(value, {
+      value = random_password.this[key].result
+    }) if value.value == null && value.random != null
+  }
+  ssm_parameters_file = {
+    for item in var.ssm_parameterss :
+    key => merge(value, {
+      value = file(value.file)
+    }) if value.value == null && value.random == null && value.file != null
+  }
+  ssm_parameters_default = {
+    for item in local.ssm_parameters :
+    key => merge(value, {
+      value = "placeholder, overwrite me outside of terraform"
+    }) if value.value == null && value.random == null && value.file == null
+  }
+
   ami_block_device_mappings = {
     for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
   }

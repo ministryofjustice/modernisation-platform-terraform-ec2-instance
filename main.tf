@@ -178,34 +178,52 @@ resource "aws_route53_record" "external" {
 }
 
 #------------------------------------------------------------------------------
-# ASM Passwords
+# SSM Parameters
 #------------------------------------------------------------------------------
 
 resource "random_password" "this" {
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+  for_each = local.ssm_random_passwords
 
-  length  = each.value.random.length
-  special = lookup(each.value.random, "special", null)
+  length  = each.value.length
+  special = each.value.special
 }
 
+# SSM parameters with values managed by terraform
 resource "aws_ssm_parameter" "this" {
-  #checkov:skip=CKV_AWS_337: Ensure SSM parameters are using KMS CMK
-  # An AWS managed key is used at the moment.
-  # Fix ticket https://dsdmoj.atlassian.net/browse/DSOS-2011
-
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+  for_each = merge(
+    local.ssm_parameters_value,
+    local.ssm_parameters_random,
+    local.ssm_parameters_file
+  )
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
   description = each.value.description
-  type        = "SecureString"
-  value       = random_password.this[each.key].result
+  type        = each.value.type
+  key_id      = each.value.kms_key_id
+  value       = each.value.value
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${var.name}-${each.key}"
-    }
-  )
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
+}
+
+# Placeholder SSM parameters with values set elsewhere
+resource "aws_ssm_parameter" "placeholder" {
+  for_each = local.ssm_parameters_default
+
+  name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
+  description = each.value.description
+  type        = each.value.type
+  key_id      = each.value.kms_key_id
+  value       = each.value.value
+
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 #------------------------------------------------------------------------------
