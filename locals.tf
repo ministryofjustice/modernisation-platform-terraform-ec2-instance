@@ -28,7 +28,7 @@ locals {
     }) if value.value == null && value.random == null && value.file != null
   }
   ssm_parameters_default = {
-    for key, value in local.ssm_parameters :
+    for key, value in var.ssm_parameters :
     key => merge(value, {
       value = "placeholder, overwrite me outside of terraform"
     }) if value.value == null && value.random == null && value.file == null
