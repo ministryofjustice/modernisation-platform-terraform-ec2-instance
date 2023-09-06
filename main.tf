@@ -227,30 +227,21 @@ resource "aws_ssm_parameter" "placeholder" {
 
 #------------------------------------------------------------------------------
 # Instance IAM role extra permissions
-# Temporarily allow get parameter when instance first created
-# Attach policy inline on ec2-common-role
+# Allow GetParameter to the EC2 scoped SSM parameter path
+# Allow PutParameter to the EC2 scoped SSM parameter path if there are
+# placeholder SSM parameters (e.g. parameters generated elsewhere in the
+# provisioning process such as ansible)
 #------------------------------------------------------------------------------
-
-resource "time_offset" "asm_parameter" {
-  # static time resource for controlling access to parameter
-  offset_minutes = 30
-  triggers = {
-    # if the instance is recycled we reset the timestamp to give access again
-    instance_id = aws_instance.this.arn
-  }
-}
 
 data "aws_iam_policy_document" "asm_parameter" {
   statement {
-    effect  = "Allow"
-    actions = ["ssm:GetParameter"]
-    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path, plus time conditional restricts access to short duration after launch
+    effect = "Allow"
+    actions = flatten([
+      "ssm:GetParameter",
+      length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
+    ])
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
     resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
-    condition {
-      test     = "DateLessThan"
-      variable = "aws:CurrentTime"
-      values   = [time_offset.asm_parameter.rfc3339]
-    }
   }
 }
 
