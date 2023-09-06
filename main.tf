@@ -193,7 +193,6 @@ resource "aws_ssm_parameter" "this" {
   for_each = merge(
     local.ssm_parameters_value,
     local.ssm_parameters_random,
-    local.ssm_parameters_file
   )
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"

@@ -21,17 +21,11 @@ locals {
       value = random_password.this[key].result
     }) if value.value == null && value.random != null
   }
-  ssm_parameters_file = {
-    for key, value in var.ssm_parameters :
-    key => merge(value, {
-      value = file(value.file)
-    }) if value.value == null && value.random == null && value.file != null
-  }
   ssm_parameters_default = {
     for key, value in var.ssm_parameters :
     key => merge(value, {
       value = "placeholder, overwrite me outside of terraform"
-    }) if value.value == null && value.random == null && value.file == null
+    }) if value.value == null && value.random == null
   }
 
   ami_block_device_mappings = {
