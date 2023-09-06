@@ -276,11 +276,10 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "ssm_parameter" {
-  count       = var.ssm_parameters != null ? 1 : 0
-  name        = "Ec2SSMParameterPolicy-${var.name}"
-  description = "Allows access to ${var.name} EC2 SSM parameters"
-  role        = aws_iam_role.this.id
-  policy      = data.aws_iam_policy_document.ssm_parameter.json
+  count  = var.ssm_parameters != null ? 1 : 0
+  name   = "Ec2SSMParameterPolicy-${var.name}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.ssm_parameter.json
 }
 
 resource "aws_iam_instance_profile" "this" {
