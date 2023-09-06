@@ -113,7 +113,7 @@ locals {
 
   user_data_args_ssm_params = {
     for key, value in var.ssm_parameters != null ? var.ssm_parameters : {} :
-    "ssm_parameter_${key}" => aws_ssm_parameter.this[key].name
+    "ssm_parameter_${key}" => try(aws_ssm_parameter.this[key].name, aws_ssm_parameter.placeholder[key].name)
   }
 
   user_data_args_common = {
