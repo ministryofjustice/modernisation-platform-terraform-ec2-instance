@@ -178,62 +178,74 @@ resource "aws_route53_record" "external" {
 }
 
 #------------------------------------------------------------------------------
-# ASM Passwords
+# SSM Parameters
 #------------------------------------------------------------------------------
 
 resource "random_password" "this" {
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+  for_each = local.ssm_random_passwords
 
-  length  = each.value.random.length
-  special = lookup(each.value.random, "special", null)
+  length  = each.value.length
+  special = each.value.special
 }
 
+# SSM parameters with values managed by terraform
 resource "aws_ssm_parameter" "this" {
-  #checkov:skip=CKV_AWS_337: Ensure SSM parameters are using KMS CMK
-  # An AWS managed key is used at the moment.
-  # Fix ticket https://dsdmoj.atlassian.net/browse/DSOS-2011
+  #checkov:skip=CKV2_AWS_34: AWS SSM Parameter should be Encrypted. SecureString is the default but can be changed by user if needed
 
-  for_each = var.ssm_parameters != null ? var.ssm_parameters : {}
+  for_each = merge(
+    local.ssm_parameters_value,
+    local.ssm_parameters_random,
+  )
 
   name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
   description = each.value.description
-  type        = "SecureString"
-  value       = random_password.this[each.key].result
+  type        = each.value.type
+  key_id      = each.value.kms_key_id
+  value       = each.value.value
 
-  tags = merge(
-    local.tags,
-    {
-      Name = "${var.name}-${each.key}"
-    }
-  )
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
+}
+
+# Placeholder SSM parameters with values set elsewhere
+resource "aws_ssm_parameter" "placeholder" {
+  #checkov:skip=CKV2_AWS_34: AWS SSM Parameter should be Encrypted. SecureString is the default but can be changed by user if needed
+
+  for_each = local.ssm_parameters_default
+
+  name        = "/${var.ssm_parameters_prefix}${var.name}/${each.key}"
+  description = each.value.description
+  type        = each.value.type
+  key_id      = each.value.kms_key_id
+  value       = each.value.value
+
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
+
+  lifecycle {
+    ignore_changes = [value]
+  }
 }
 
 #------------------------------------------------------------------------------
 # Instance IAM role extra permissions
-# Temporarily allow get parameter when instance first created
-# Attach policy inline on ec2-common-role
+# Allow GetParameter to the EC2 scoped SSM parameter path
+# Allow PutParameter to the EC2 scoped SSM parameter path if there are
+# placeholder SSM parameters (e.g. parameters generated elsewhere in the
+# provisioning process such as ansible)
 #------------------------------------------------------------------------------
 
-resource "time_offset" "asm_parameter" {
-  # static time resource for controlling access to parameter
-  offset_minutes = 30
-  triggers = {
-    # if the instance is recycled we reset the timestamp to give access again
-    instance_id = aws_instance.this.arn
-  }
-}
-
-data "aws_iam_policy_document" "asm_parameter" {
+data "aws_iam_policy_document" "ssm_parameter" {
   statement {
-    effect  = "Allow"
-    actions = ["ssm:GetParameter"]
-    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path, plus time conditional restricts access to short duration after launch
+    effect = "Allow"
+    actions = flatten([
+      "ssm:GetParameter",
+      length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
+    ])
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
     resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
-    condition {
-      test     = "DateLessThan"
-      variable = "aws:CurrentTime"
-      values   = [time_offset.asm_parameter.rfc3339]
-    }
   }
 }
 
@@ -267,11 +279,11 @@ resource "aws_iam_role" "this" {
   )
 }
 
-resource "aws_iam_role_policy" "asm_parameter" {
+resource "aws_iam_role_policy" "ssm_parameter" {
   count  = var.ssm_parameters != null ? 1 : 0
-  name   = "asm-parameter-access-${var.name}"
+  name   = "Ec2SSMParameterPolicy-${var.name}"
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.asm_parameter.json
+  policy = data.aws_iam_policy_document.ssm_parameter.json
 }
 
 resource "aws_iam_instance_profile" "this" {
