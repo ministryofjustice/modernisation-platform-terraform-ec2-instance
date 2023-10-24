@@ -200,7 +200,7 @@ variable "secretsmanager_secrets" {
   type = map(object({
     description = optional(string)
 
-    kms_key_id  = optional(string)
+    kms_key_id = optional(string)
   }))
   default = null
 }
