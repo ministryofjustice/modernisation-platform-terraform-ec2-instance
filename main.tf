@@ -229,6 +229,18 @@ resource "aws_ssm_parameter" "placeholder" {
   }
 }
 
+resource "aws_secretsmanager_secret" "placeholder" {
+  for_each = local.secretsmanager_secrets
+
+  name        = "/${var.secretsmanager_secrets_prefix}${var.name}/${each.key}"
+  description = each.value.description
+  kms_key_id  = each.value.kms_key_id
+
+  tags = merge(local.tags, {
+    Name = "${var.name}-${each.key}"
+  })
+}
+
 #------------------------------------------------------------------------------
 # Instance IAM role extra permissions
 # Allow GetParameter to the EC2 scoped SSM parameter path
@@ -246,6 +258,17 @@ data "aws_iam_policy_document" "ssm_parameter" {
     ])
     #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
     resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+  }
+}
+data "aws_iam_policy_document" "secretsmanager" {
+  statement {
+    effect = "Allow"
+    actions = flatten([
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:PutSecretValue"
+    ])
+    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
+    resources = ["arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.id}:secret/${var.secretsmanager_secrets_prefix}${var.name}/*"]
   }
 }
 
@@ -284,6 +307,12 @@ resource "aws_iam_role_policy" "ssm_parameter" {
   name   = "Ec2SSMParameterPolicy-${var.name}"
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.ssm_parameter.json
+}
+resource "aws_iam_role_policy" "secretsmanager_secret" {
+  count  = var.secretsmanager_secrets != null ? 1 : 0
+  name   = "Ec2SecretsmanagerSecretPolicy-${var.name}"
+  role   = aws_iam_role.this.id
+  policy = data.aws_iam_policy_document.secretsmanager.json
 }
 
 resource "aws_iam_instance_profile" "this" {
