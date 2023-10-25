@@ -230,7 +230,7 @@ resource "aws_ssm_parameter" "placeholder" {
 }
 
 resource "aws_secretsmanager_secret" "placeholder" {
-  for_each = local.secretsmanager_secrets
+  for_each = var.secretsmanager_secrets
 
   name        = "/${var.secretsmanager_secrets_prefix}${var.name}/${each.key}"
   description = each.value.description
