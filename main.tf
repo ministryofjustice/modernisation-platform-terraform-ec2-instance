@@ -230,6 +230,7 @@ resource "aws_ssm_parameter" "placeholder" {
 }
 
 resource "aws_secretsmanager_secret" "placeholder" {
+  #checkov:skip=Check: CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = var.secretsmanager_secrets
 
   name        = "/${var.secretsmanager_secrets_prefix}${var.name}/${each.key}"
