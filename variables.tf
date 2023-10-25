@@ -174,6 +174,11 @@ variable "ssm_parameters_prefix" {
   description = "Optionally prefix ssm parameters with this prefix.  Add a trailing /"
   default     = ""
 }
+variable "secretsmanager_secrets_prefix" {
+  type        = string
+  description = "Optionally prefix secretsmanager secrets with this prefix.  Add a trailing /"
+  default     = ""
+}
 
 variable "ssm_parameters" {
   description = "A map of SSM parameters to create. Set a specific value or a randomly generated value.  If neither random or value are set, a placeholder value is created which can be updated outside of terraform"
@@ -188,6 +193,15 @@ variable "ssm_parameters" {
     value = optional(string)
   }))
   default = null
+}
+
+variable "secretsmanager_secrets" {
+  description = "A map of secretsmanager secrets to create. No value is created, add a value outside of terraform"
+  type = map(object({
+    description = optional(string)
+    kms_key_id  = optional(string)
+  }))
+  default = {}
 }
 
 variable "cloudwatch_metric_alarms" {
