@@ -199,8 +199,7 @@ variable "secretsmanager_secrets" {
   description = "A map of secretsmanager secrets to create. No value is created, add a value outside of terraform"
   type = map(object({
     description = optional(string)
-
-    kms_key_id = optional(string)
+    kms_key_id  = optional(string)
   }))
   default = null
 }
