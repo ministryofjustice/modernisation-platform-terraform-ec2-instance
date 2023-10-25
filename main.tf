@@ -230,6 +230,8 @@ resource "aws_ssm_parameter" "placeholder" {
 }
 
 resource "aws_secretsmanager_secret" "placeholder" {
+  # skipped check to keep consistent behaviour between ssm params and secrets
+  # Rotation can be added later as a configurable option. Some will want it, for some it will break things
   #checkov:skip=CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = var.secretsmanager_secrets
 
