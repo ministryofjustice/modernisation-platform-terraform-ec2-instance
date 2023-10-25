@@ -268,7 +268,7 @@ data "aws_iam_policy_document" "secretsmanager" {
       "secretsmanager:PutSecretValue"
     ])
     #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
-    resources = ["arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.id}:secret/${var.secretsmanager_secrets_prefix}${var.name}/*"]
+    resources = ["arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.id}:secret:/${var.secretsmanager_secrets_prefix}${var.name}/*"]
   }
 }
 
