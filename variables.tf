@@ -201,7 +201,7 @@ variable "secretsmanager_secrets" {
     description = optional(string)
     kms_key_id  = optional(string)
   }))
-  default = null
+  default = {}
 }
 
 variable "cloudwatch_metric_alarms" {
