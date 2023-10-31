@@ -89,6 +89,9 @@ resource "aws_instance" "this" {
 
   tags = merge(local.tags, var.instance.tags, {
     Name = var.name
+    },
+    {
+      backup = var.backup == "all" || var.backup == "ec2" ? true : false
   })
 }
 
@@ -131,11 +134,15 @@ resource "aws_ebs_volume" "this" {
   # you may run into a permission issue if the AMI is not in self account
   snapshot_id = lookup(each.value, "snapshot_id", null)
 
-  tags = merge(local.tags, var.ebs_volume_tags, {
-    Name = try(
-      join("-", [var.name, each.value.label, each.key]),
-      join("-", [var.name, each.key])
-    )
+  tags = merge(local.tags, var.ebs_volume_tags,
+    {
+      Name = try(
+        join("-", [var.name, each.value.label, each.key]),
+        join("-", [var.name, each.key])
+      )
+    },
+    {
+      backup = var.backup == "all" || var.backup == "ebs" ? true : false
   })
 
   lifecycle {

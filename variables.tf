@@ -223,3 +223,9 @@ variable "cloudwatch_metric_alarms" {
   }))
   default = {}
 }
+
+variable "backup" {
+  type        = string
+  description = "Optionally specify whether this EC2 should be backe up. Set to all for both ec2 and ebs backups, ec2 for ec2 only backup or ebs for ebs only backup."
+  default     = "all"
+}
