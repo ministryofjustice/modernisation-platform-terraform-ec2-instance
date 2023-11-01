@@ -32,9 +32,9 @@ resource "aws_instance" "this" {
 
     tags = merge(local.tags, var.ebs_volume_tags, {
       Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
-    },
-    {
-      backup = (var.backup == "all" || var.backup == "ebs") && (lookup(local.tags, "backup", "default") != false) && (lookup(var.ebs_volume_tags, "backup", "default") != false) ? true : false
+      },
+      {
+        backup = (var.backup == "all" || var.backup == "ebs") && (lookup(local.tags, "backup", "default") != false) && (lookup(var.ebs_volume_tags, "backup", "default") != false) ? true : false
     })
   }
 
@@ -65,14 +65,14 @@ resource "aws_instance" "this" {
       volume_type = ebs_block_device.value.type
 
       tags = merge(local.tags, var.ebs_volume_tags,
-      {
-        Name = try(
-          join("-", [var.name, ebs_block_device.value.label, ebs_block_device.key]),
-          join("-", [var.name, ebs_block_device.key])
-        )
-      },
-      {
-        backup = (var.backup == "all" || var.backup == "ebs") && (lookup(local.tags, "backup", "default") != false) && (lookup(var.ebs_volume_tags, "backup", "default") != false) ? true : false
+        {
+          Name = try(
+            join("-", [var.name, ebs_block_device.value.label, ebs_block_device.key]),
+            join("-", [var.name, ebs_block_device.key])
+          )
+        },
+        {
+          backup = (var.backup == "all" || var.backup == "ebs") && (lookup(local.tags, "backup", "default") != false) && (lookup(var.ebs_volume_tags, "backup", "default") != false) ? true : false
       })
     }
   }
