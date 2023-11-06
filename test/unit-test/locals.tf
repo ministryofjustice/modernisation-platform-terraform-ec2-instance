@@ -35,6 +35,7 @@ locals {
 
     instance = {
       disable_api_termination      = false
+      disable_api_stop             = false
       instance_type                = "t3.micro"
       key_name                     = aws_key_pair.ec2-terratest-user.key_name
       monitoring                   = false
