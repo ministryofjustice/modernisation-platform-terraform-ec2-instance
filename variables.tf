@@ -72,7 +72,7 @@ variable "instance" {
   type = object({
     associate_public_ip_address  = optional(bool, false)
     disable_api_termination      = bool
-    disable_api_stop             = bool    
+    disable_api_stop             = bool
     instance_type                = string
     key_name                     = string
     metadata_endpoint_enabled    = optional(string, "enabled")
