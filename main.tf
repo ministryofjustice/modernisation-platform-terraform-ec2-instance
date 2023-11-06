@@ -6,6 +6,7 @@ resource "aws_instance" "this" {
   ami                         = data.aws_ami.this.id
   associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
+  disable_api_stop            = var.instance.disable_api_stop
   ebs_optimized               = data.aws_ec2_instance_type.this.ebs_optimized_support == "unsupported" ? false : true
   iam_instance_profile        = aws_iam_instance_profile.this.name
   instance_type               = var.instance.instance_type
