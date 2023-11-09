@@ -253,7 +253,7 @@ resource "aws_secretsmanager_secret" "placeholder" {
 # provisioning process such as ansible)
 #------------------------------------------------------------------------------
 
-data "aws_iam_policy_document" "ssm_parameter" {
+data "aws_iam_policy_document" "ssm_params_and_secrets" {
   statement {
     effect = "Allow"
     actions = flatten([
@@ -263,8 +263,6 @@ data "aws_iam_policy_document" "ssm_parameter" {
     #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
     resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
   }
-}
-data "aws_iam_policy_document" "secretsmanager" {
   statement {
     effect = "Allow"
     actions = flatten([
@@ -306,17 +304,11 @@ resource "aws_iam_role" "this" {
   )
 }
 
-resource "aws_iam_role_policy" "ssm_parameter" {
-  count  = var.ssm_parameters != null ? 1 : 0
-  name   = "Ec2SSMParameterPolicy-${var.name}"
+resource "aws_iam_role_policy" "ssm_params_and_secrets" {
+  count  = var.ssm_parameters != null && var.secretsmanager_secrets != null ? 1 : 0
+  name   = "Ec2SSMParamsAndSecretsPolicy-${var.name}"
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.ssm_parameter.json
-}
-resource "aws_iam_role_policy" "secretsmanager_secret" {
-  count  = var.secretsmanager_secrets != null ? 1 : 0
-  name   = "Ec2SecretsmanagerSecretPolicy-${var.name}"
-  role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.secretsmanager.json
+  policy = data.aws_iam_policy_document.ssm_params_and_secrets.json
 }
 
 resource "aws_iam_instance_profile" "this" {
