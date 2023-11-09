@@ -305,7 +305,7 @@ resource "aws_iam_role" "this" {
 }
 
 resource "aws_iam_role_policy" "ssm_params_and_secrets" {
-  count  = var.ssm_parameters != null ? 1 : 0
+  count  = var.ssm_parameters != null && var.secretsmanager_secrets != null ? 1 : 0
   name   = "Ec2SSMParamsAndSecretsPolicy-${var.name}"
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.ssm_params_and_secrets.json
