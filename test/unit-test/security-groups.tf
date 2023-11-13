@@ -3,7 +3,7 @@ resource "aws_security_group" "test" {
   #checkov:skip=CKV_AWS_25:
   #checkov:skip=CKV_AWS_24:
   #checkov:skip=CKV_AWS_260:
-  name        = "Terratest-SG"
+  name        = "Terratest-SG${random_id.test_id.hex}"
   description = "Test SG for Terratest"
   vpc_id      = data.aws_vpc.shared.id
   ingress {
@@ -13,8 +13,6 @@ resource "aws_security_group" "test" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
     description      = "Test SG for Terratest"
-
-
   }
 
   egress {

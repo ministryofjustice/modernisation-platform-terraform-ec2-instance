@@ -1,3 +1,7 @@
+resource "random_id" "test_id" {
+  byte_length = 4
+}
+
 module "ec2_test_instance" {
   source = "../../"
 
@@ -7,7 +11,7 @@ module "ec2_test_instance" {
 
   for_each = try(local.ec2_test.ec2_test_instances, {})
 
-  name = each.key
+  name = "${each.key}${random_id.test_id.hex}"
 
   ami_name                      = each.value.ami_name
   ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
@@ -15,11 +19,12 @@ module "ec2_test_instance" {
   ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ebs_volume_tags               = lookup(each.value, "ebs_volume_tags", {})
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
 
-  iam_resource_names_prefix = "ec2-test-instance"
+  iam_resource_names_prefix = "ec2-test-instance${random_id.test_id.hex}"
   instance_profile_policies = local.ec2_common_managed_policies
 
   business_unit            = local.business_unit
