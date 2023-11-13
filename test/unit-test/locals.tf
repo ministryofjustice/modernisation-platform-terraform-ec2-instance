@@ -31,6 +31,7 @@ locals {
   ec2_test = {
     tags = {
       component = "test"
+      backup    = true
     }
 
     instance = {
@@ -81,9 +82,15 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "test"
+          backup      = true
         }
+        ebs_block_device_inline = true
         ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 30 }
+          "/dev/sdb"  = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 100 }
+        }
+        ebs_volume_tags = {
+          backup = false
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
@@ -96,9 +103,16 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "test"
+          backup      = false
         }
+        ebs_block_device_inline = false
         ebs_volumes = {
           "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn }
+          "/dev/sdb"  = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 100 }
+
+        }
+        ebs_volume_tags = {
+          backup = true
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
@@ -125,7 +139,7 @@ locals {
 
 # create single managed policy
 resource "aws_iam_policy" "ec2_test_common_policy" {
-  name        = "ec2-test-common-policy"
+  name        = "ec2-test-common-policy${random_id.test_id.hex}"
   path        = "/"
   description = "Common policy for all ec2 instances"
   policy      = data.aws_iam_policy_document.ec2_test_common_combined.json
@@ -139,7 +153,7 @@ resource "aws_iam_policy" "ec2_test_common_policy" {
 
 # Keypair for ec2-terratest-user
 resource "aws_key_pair" "ec2-terratest-user" {
-  key_name   = "ec2-terratest-user"
+  key_name   = "ec2-terratest-user${random_id.test_id.hex}"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 email@example.com"
   tags = merge(
     local.tags,
