@@ -31,7 +31,7 @@ locals {
   ec2_test = {
     tags = {
       component = "test"
-      backup = true
+      backup    = true
     }
 
     instance = {
@@ -82,11 +82,11 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "test"
-          backup = true
+          backup      = true
         }
         ebs_block_device_inline = true
         ebs_volumes = {
-          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 30}
+          "/dev/sda1" = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 30 }
           "/dev/sdb"  = { kms_key_id = data.aws_kms_key.default_ebs.arn, size = 100 }
         }
         ebs_volume_tags = {
@@ -103,7 +103,7 @@ locals {
           os-type     = "Linux"
           component   = "ndh"
           environment = "test"
-          backup = false
+          backup      = false
         }
         ebs_block_device_inline = false
         ebs_volumes = {

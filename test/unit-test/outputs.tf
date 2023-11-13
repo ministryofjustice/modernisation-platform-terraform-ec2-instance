@@ -64,20 +64,20 @@ output "backup-instance-2-ebs-volume-tag-input" {
 
 output "applied-instance-backup-tag" {
   description = "backup tag applied on the instance"
-  value       = [ for instance in module.ec2_test_instance : instance.aws_instance.tags.backup ]
+  value       = [for instance in module.ec2_test_instance : instance.aws_instance.tags.backup]
 }
 
 output "applied-backup-root-inline-tag" {
   description = "backup tag applied inline on the instance root block device"
-  value       = [ for instance in module.ec2_test_instance : instance.aws_instance.root_block_device[0].tags.backup ]
+  value       = [for instance in module.ec2_test_instance : instance.aws_instance.root_block_device[0].tags.backup]
 }
 
 output "applied-backup-ebs-inline-tag" {
   description = "backup tag applied inline on the instance ebs block device"
-  value       = [ for instance in module.ec2_test_instance : [ for ebs_block in instance.aws_instance.ebs_block_device : ebs_block.tags.backup ] ]
+  value       = [for instance in module.ec2_test_instance : [for ebs_block in instance.aws_instance.ebs_block_device : ebs_block.tags.backup]]
 }
 
 output "applied-backup-ebs-tag" {
   description = "backup tag applied on the ebs_volume"
-  value       = [ for instance in module.ec2_test_instance : [for ebs_device in instance.aws_ebs_volume : ebs_device.tags.backup] ]
+  value       = [for instance in module.ec2_test_instance : [for ebs_device in instance.aws_ebs_volume : ebs_device.tags.backup]]
 }
