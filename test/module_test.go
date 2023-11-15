@@ -19,7 +19,7 @@ func TestModule(t *testing.T) {
 	defer terraform.Destroy(t, terraformOptions)
 	terraform.InitAndApply(t, terraformOptions)
 
-	secGroupId := terraform.Output(t, terraformOptions, "securtiy-group-id")
+	secGroupId := terraform.Output(t, terraformOptions, "security-group-id")
 	keyPair := terraform.Output(t, terraformOptions, "key-pair")
 	iamPolicy := terraform.Output(t, terraformOptions, "iam-policy")
 	amiName := terraform.Output(t, terraformOptions, "ami-name")

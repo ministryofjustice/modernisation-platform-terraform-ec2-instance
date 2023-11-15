@@ -24,6 +24,7 @@ module "ec2_test_instance" {
   ebs_kms_key_id                = module.environment.kms_keys["ebs"].arn
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
+  ebs_volume_tags               = lookup(each.value, "ebs_volume_tags", {})
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
@@ -42,14 +43,32 @@ module "ec2_test_instance" {
   cloudwatch_metric_alarms = {}
 }
 
-
-```
-
 For a deployed example, please check [example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2.tf#L233)
-<!--- BEGIN_TF_DOCS --->
+```
+### Setting backup tags
+Read [the Modernisation Platform backup functionality](https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/backups.html#backups) to understand how the backup plan works.
+The following is a summary of the backup behaviour based on the tags that are set and passed in this module.
 
+#### Production environment
+By default, all production resources (EC2 and EBS) will be backed up. This is determined by the `is-production` tag being set to `true`.
+Production backups can be skipped by setting `backup` tag to `false` (passed in `tags` input).
 
-<!--- END_TF_DOCS --->
+#### Non-production environments
+Additionally, you are able to control backups in non-production environments by setting `backup` tag to `true` (passed in `tags` input).
+
+#### Backup duplication problem
+NOTE, setting `backup` tag to `true` that is passed in `tags` input will set `backup` tag to `true` on all EC2 and EBS resources.
+This will result in duplicated backups as EBS resources that are part of an EC2 will get backed up during the EC2 backup and EBS backup selection by the backup plan.
+
+In order to select either EC2 backups or EBS backups it is possible to set `backup` tag to `true` on only EC2 instance, by passing the tag as part of the `instance.tags` input or setting the `backup` tag to `true` on only EBS by setting the `backup` tag to `true` and passing it in the `ebs_volume_tags` input.
+NOTE, if the `backup` tag is passed in `tags` and `instance.tags`/`ebs_volume_tags`, the tag set on the specific resources will take priority.
+For example, `backup` tag is set to:
+* `true` via `tags` input
+* `false` via `instance.tags` input
+* `true` via `ebs_volume_tags` input
+will result in:
+* EC2 not being backed up
+* all EBS being backed up (that includes root ebs, inline ebs and attached ebs).
 
 ## Looking for issues?
 If you're looking to raise an issue with this module, please create a new issue in the [Modernisation Platform repository](https://github.com/ministryofjustice/modernisation-platform/issues).
@@ -88,8 +107,7 @@ No modules.
 | [aws_eip_association.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eip_association) | resource |
 | [aws_iam_instance_profile.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.secretsmanager_secret](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
-| [aws_iam_role_policy.ssm_parameter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
+| [aws_iam_role_policy.ssm_params_and_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_route53_record.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
@@ -101,8 +119,7 @@ No modules.
 | [aws_ami.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
 | [aws_ec2_instance_type.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ec2_instance_type) | data source |
-| [aws_iam_policy_document.secretsmanager](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.ssm_parameter](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.ssm_params_and_secrets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_route53_zone.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [aws_route53_zone.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 | [cloudinit_config.this](https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config) | data source |
@@ -125,7 +142,7 @@ No modules.
 | <a name="input_ebs_volumes_copy_all_from_ami"></a> [ebs\_volumes\_copy\_all\_from\_ami](#input\_ebs\_volumes\_copy\_all\_from\_ami) | If true, ensure all volumes in AMI are also present in EC2.  If false, only create volumes specified in ebs\_volumes var | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Application environment - i.e. the terraform workspace | `string` | n/a | yes |
 | <a name="input_iam_resource_names_prefix"></a> [iam\_resource\_names\_prefix](#input\_iam\_resource\_names\_prefix) | Prefix IAM resources with this prefix, e.g. ec2-database | `string` | `"ec2"` | no |
-| <a name="input_instance"></a> [instance](#input\_instance) | EC2 instance settings, see aws\_instance documentation | <pre>object({<br>    associate_public_ip_address  = optional(bool, false)<br>    disable_api_termination      = bool<br>    instance_type                = string<br>    key_name                     = string<br>    metadata_endpoint_enabled    = optional(string, "enabled")<br>    metadata_options_http_tokens = optional(string, "required")<br>    monitoring                   = optional(bool, true)<br>    ebs_block_device_inline      = optional(bool, false)<br>    vpc_security_group_ids       = list(string)<br>    private_dns_name_options = optional(object({<br>      enable_resource_name_dns_aaaa_record = optional(bool)<br>      enable_resource_name_dns_a_record    = optional(bool)<br>      hostname_type                        = string<br>    }))<br>    tags = optional(map(string), {})<br>  })</pre> | n/a | yes |
+| <a name="input_instance"></a> [instance](#input\_instance) | EC2 instance settings, see aws\_instance documentation | <pre>object({<br>    associate_public_ip_address  = optional(bool, false)<br>    disable_api_termination      = bool<br>    disable_api_stop             = bool<br>    instance_type                = string<br>    key_name                     = string<br>    metadata_endpoint_enabled    = optional(string, "enabled")<br>    metadata_options_http_tokens = optional(string, "required")<br>    monitoring                   = optional(bool, true)<br>    ebs_block_device_inline      = optional(bool, false)<br>    vpc_security_group_ids       = list(string)<br>    private_dns_name_options = optional(object({<br>      enable_resource_name_dns_aaaa_record = optional(bool)<br>      enable_resource_name_dns_a_record    = optional(bool)<br>      hostname_type                        = string<br>    }))<br>    tags = optional(map(string), {})<br>  })</pre> | n/a | yes |
 | <a name="input_instance_profile_policies"></a> [instance\_profile\_policies](#input\_instance\_profile\_policies) | A list of managed IAM policy document ARNs to be attached to the database instance profile | `list(string)` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Provide a unique name for the instance | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Destination AWS Region for the infrastructure | `string` | `"eu-west-2"` | no |
@@ -143,5 +160,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_aws_ebs_volume"></a> [aws\_ebs\_volume](#output\_aws\_ebs\_volume) | aws\_ebs\_volume resource |
 | <a name="output_aws_instance"></a> [aws\_instance](#output\_aws\_instance) | aws\_instance resource |
 <!-- END_TF_DOCS -->
