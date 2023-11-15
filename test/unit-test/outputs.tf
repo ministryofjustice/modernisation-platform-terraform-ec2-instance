@@ -1,4 +1,4 @@
-output "securtiy-group-id" {
+output "security-group-id" {
   description = "The sg"
   value       = try(aws_security_group.test.arn, "")
 }
