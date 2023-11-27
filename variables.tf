@@ -208,7 +208,7 @@ variable "secretsmanager_secrets" {
     }))
     value = optional(string)
   }))
-  default = {}
+  default = null
 }
 
 variable "cloudwatch_metric_alarms" {
