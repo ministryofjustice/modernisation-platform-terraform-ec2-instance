@@ -247,7 +247,7 @@ resource "aws_secretsmanager_secret" "placeholder" {
   #checkov:skip=CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = var.secretsmanager_secrets
 
-  name                    = /${var.secretsmanager_secrets_prefix}${var.name}/${each.key}
+  name                    = "/${var.secretsmanager_secrets_prefix}${var.name}/${each.key}"
   description             = each.value.description
   kms_key_id              = each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   recovery_window_in_days = each.value.recovery_window_in_days
