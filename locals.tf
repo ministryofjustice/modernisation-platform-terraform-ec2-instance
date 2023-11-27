@@ -43,7 +43,7 @@ locals {
     }) if value.value == null && value.random != null
   }
   secretsmanager_secrets_default = {
-    for key, value in var.ssecretsmanager_secret != null ? var.secretsmanager_secrets : {} :
+    for key, value in var.secretsmanager_secret != null ? var.secretsmanager_secrets : {} :
     key => merge(value, {
       value = "placeholder, overwrite me outside of terraform"
     }) if value.value == null && value.random == null

@@ -261,7 +261,6 @@ resource "aws_secretsmanager_secret_version" "fixed" {
   for_each = merge(
     local.secretsmanager_secrets_value,
     local.secretsmanager_secrets_random,
-    local.secretsmanager_secrets_file
   )
 
   secret_id     = aws_secretsmanager_secret.this[each.key]
