@@ -44,9 +44,7 @@ locals {
   }
   secretsmanager_secrets_default = {
     for key, value in var.secretsmanager_secrets != null ? var.secretsmanager_secrets : {} :
-    key => merge(value, {
-      value = "placeholder, overwrite me outside of terraform"
-    }) if value.value == null && value.random == null
+    key => value if value.value == null && value.random == null
   }
 
   ami_block_device_mappings = {
