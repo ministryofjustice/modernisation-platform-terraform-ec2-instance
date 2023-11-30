@@ -20,6 +20,8 @@ module "ec2_test_instance" {
   ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
   ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
   ebs_volume_tags               = lookup(each.value, "ebs_volume_tags", {})
+  secretsmanager_secrets_prefix = lookup(each.value, "secretsmanager_secrets_prefix", "test/")
+  secretsmanager_secrets        = lookup(each.value, "secretsmanager_secrets", null)
   ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                = lookup(each.value, "ssm_parameters", null)
   route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
