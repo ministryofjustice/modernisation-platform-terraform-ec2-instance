@@ -294,19 +294,18 @@ resource "aws_secretsmanager_secret" "placeholder" {
 
 data "aws_iam_policy_document" "ssm_params_and_secrets" {
   count = var.ssm_parameters != null || var.secretsmanager_secrets != null ? 1 : 0
-  #dynamic "statement" {
-  #  # for_each = var.ssm_parameters != null ? ["ssm"] : []
-  #  for_each = []
-  #  block {
-  #    effect = "Allow"
-  #    actions = flatten([
-  #      "ssm:GetParameter",
-  #      length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
-  #    ])
-  #    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
-  #    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
-  #  }
-  #}
+  dynamic "statement" {
+    for_each = var.ssm_parameters != null ? ["ssm"] : []
+    block {
+      effect = "Allow"
+      actions = flatten([
+        "ssm:GetParameter",
+        length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
+      ])
+      #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
+      resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+    }
+  }
   dynamic "statement" {
     for_each = var.secretsmanager_secrets != null ? ["secret"] : []
     block {
