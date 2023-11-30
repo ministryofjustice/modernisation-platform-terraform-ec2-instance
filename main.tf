@@ -295,7 +295,8 @@ resource "aws_secretsmanager_secret" "placeholder" {
 data "aws_iam_policy_document" "ssm_params_and_secrets" {
   count = var.ssm_parameters != null || var.secretsmanager_secrets != null ? 1 : 0
   dynamic "statement" {
-    for_each = var.ssm_parameters != null ? ["ssm"] : []
+    # for_each = var.ssm_parameters != null ? ["ssm"] : []
+    for_each = []
     block {
       effect = "Allow"
       actions = flatten([
