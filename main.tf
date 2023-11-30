@@ -293,23 +293,30 @@ resource "aws_secretsmanager_secret" "placeholder" {
 #------------------------------------------------------------------------------
 
 data "aws_iam_policy_document" "ssm_params_and_secrets" {
-  statement {
-    effect = "Allow"
-    actions = flatten([
-      "ssm:GetParameter",
-      length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
-    ])
-    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
-    resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+  count = var.ssm_parameters != null || var.secretsmanager_secrets != null ? 1 : 0
+  dynamic "statement" {
+    for_each = var.ssm_parameters != null ? ["ssm"] : []
+    block {
+      effect = "Allow"
+      actions = flatten([
+        "ssm:GetParameter",
+        length(aws_ssm_parameter.placeholder) != 0 ? ["ssm:PutParameter"] : []
+      ])
+      #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
+      resources = ["arn:aws:ssm:${var.region}:${data.aws_caller_identity.current.id}:parameter/${var.ssm_parameters_prefix}${var.name}/*"]
+    }
   }
-  statement {
-    effect = "Allow"
-    actions = flatten([
-      "secretsmanager:GetSecretValue",
-      length(aws_secretsmanager_secret.placeholder) != 0 ? ["secretsmanager:PutSecretValue"] : []
-    ])
-    #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
-    resources = ["arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.id}:secret:/${var.secretsmanager_secrets_prefix}${var.name}/*"]
+  dynamic "statement" {
+    for_each = var.ssm_parameters != null ? ["secret"] : []
+    block {
+      effect = "Allow"
+      actions = flatten([
+        "secretsmanager:GetSecretValue",
+        length(aws_secretsmanager_secret.placeholder) != 0 ? ["secretsmanager:PutSecretValue"] : []
+      ])
+      #tfsec:ignore:aws-iam-no-policy-wildcards: acccess scoped to parameter path of EC2
+      resources = ["arn:aws:secretsmanager:${var.region}:${data.aws_caller_identity.current.id}:secret:/${var.secretsmanager_secrets_prefix}${var.name}/*"]
+    }
   }
 }
 
@@ -347,7 +354,7 @@ resource "aws_iam_role_policy" "ssm_params_and_secrets" {
   count  = var.ssm_parameters != null || var.secretsmanager_secrets != null ? 1 : 0
   name   = "Ec2SSMParamsAndSecretsPolicy-${var.name}"
   role   = aws_iam_role.this.id
-  policy = data.aws_iam_policy_document.ssm_params_and_secrets.json
+  policy = data.aws_iam_policy_document.ssm_params_and_secrets[0].json
 }
 
 resource "aws_iam_instance_profile" "this" {
