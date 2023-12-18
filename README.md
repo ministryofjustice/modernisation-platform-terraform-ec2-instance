@@ -112,10 +112,13 @@ No modules.
 | [aws_instance.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) | resource |
 | [aws_route53_record.external](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_record.internal](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_secretsmanager_secret.fixed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret.placeholder](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.fixed](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [aws_ssm_parameter.placeholder](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_ssm_parameter.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ssm_parameter) | resource |
 | [aws_volume_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/volume_attachment) | resource |
+| [random_password.secrets](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_password.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [aws_ami.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami) | data source |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
@@ -148,7 +151,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Provide a unique name for the instance | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Destination AWS Region for the infrastructure | `string` | `"eu-west-2"` | no |
 | <a name="input_route53_records"></a> [route53\_records](#input\_route53\_records) | Optionally create internal and external DNS records | <pre>object({<br>    create_internal_record = bool<br>    create_external_record = bool<br>  })</pre> | n/a | yes |
-| <a name="input_secretsmanager_secrets"></a> [secretsmanager\_secrets](#input\_secretsmanager\_secrets) | A map of secretsmanager secrets to create. No value is created, add a value outside of terraform | <pre>map(object({<br>    description = optional(string)<br>    kms_key_id  = optional(string)<br>  }))</pre> | `{}` | no |
+| <a name="input_secretsmanager_secrets"></a> [secretsmanager\_secrets](#input\_secretsmanager\_secrets) | A map of secretsmanager secrets to create. Set a specific value or a randomly generated value.  If neither random or value are set, a placeholder value is created which can be updated outside of terraform | <pre>map(object({<br>    description             = optional(string)<br>    kms_key_id              = optional(string)<br>    recovery_window_in_days = optional(number)<br>    random = optional(object({<br>      length  = number<br>      special = optional(bool)<br>    }))<br>    value = optional(string)<br>  }))</pre> | `null` | no |
 | <a name="input_secretsmanager_secrets_prefix"></a> [secretsmanager\_secrets\_prefix](#input\_secretsmanager\_secrets\_prefix) | Optionally prefix secretsmanager secrets with this prefix.  Add a trailing / | `string` | `""` | no |
 | <a name="input_ssm_parameters"></a> [ssm\_parameters](#input\_ssm\_parameters) | A map of SSM parameters to create. Set a specific value or a randomly generated value.  If neither random or value are set, a placeholder value is created which can be updated outside of terraform | <pre>map(object({<br>    description = optional(string)<br>    type        = optional(string, "SecureString")<br>    kms_key_id  = optional(string)<br>    random = optional(object({<br>      length  = number<br>      special = optional(bool)<br>    }))<br>    value = optional(string)<br>  }))</pre> | `null` | no |
 | <a name="input_ssm_parameters_prefix"></a> [ssm\_parameters\_prefix](#input\_ssm\_parameters\_prefix) | Optionally prefix ssm parameters with this prefix.  Add a trailing / | `string` | `""` | no |
