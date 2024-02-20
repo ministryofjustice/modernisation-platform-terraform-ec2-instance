@@ -28,7 +28,6 @@ resource "aws_key_pair" "ec2-user" {
   )
 }
 
-
 # This locals block contains variables required to create ec2 instances using the module.
 
 locals {
@@ -47,14 +46,12 @@ locals {
     vpc_security_group_ids       = try([aws_security_group.example_ec2_sg.id])
   }
 
-
   # This local block contains the variables required to build one of more ec2s. 
   ec2_test = {
 
     tags = {
       component = "example-ec2-build-using-module"
     }
-
 
     # The object ec2_instances requires one or more sub objects to be created. The key of each object (e.g. example-1) will
     # be used for 'Name' tag values as well as prefix of R53 records (see above). Each contains an example of user-data and adds a 2nd
@@ -122,40 +119,33 @@ locals {
           create_external_record = false
         }
       }
-
     }
-  
   }
 
   # This local provides a list of ingress and egress rules for the ec2 security group.
-
+  
   example_ec2_sg_ingress_rules = {
-
     TCP_22 = {
       from_port = 22
       to_port = 22
       protocol = "TCP"
       cidr_block = data.aws_vpc.shared.cidr_block
     }
-
     TCP_443 = {
       from_port = 443
       to_port = 443
       protocol = "TCP"
       cidr_block = data.aws_vpc.shared.cidr_block
     }
-
   }
 
   example_ec2_sg_egress_rules = {
-
     TCP_ALL = {
       from_port = 1
       to_port = 65000
       protocol = "TCP"
       cidr_block = "0.0.0.0/0"
     }
-
   }
 
   # create list of common managed policies that can be attached to ec2 instance profiles
@@ -165,16 +155,12 @@ locals {
 
 }
 
-
-
-
 # This item is used to combine emultiple policy documents though for this example only one policy document is created.
 data "aws_iam_policy_document" "ec2_common_combined" {
   source_policy_documents = [
     data.aws_iam_policy_document.ec2_policy.json  
   ]
 }
-
 
 # This policy document is added as an example. Note that the module does not support access via AWS Session Manager.
 data "aws_iam_policy_document" "ec2_policy" {
@@ -195,7 +181,6 @@ data "aws_iam_policy_document" "ec2_policy" {
     resources = ["*"] #tfsec:ignore:aws-iam-no-policy-wildcards
   }
 }
-
 
 # This is the main call to the module. Note the for_each loop.
 module "ec2_instance" {
@@ -227,7 +212,6 @@ module "ec2_instance" {
   user_data_raw            = try(each.value.user_data, "")
   cloudwatch_metric_alarms = {}
 }
-
 
 ###### EC2 Security Groups ######
 
