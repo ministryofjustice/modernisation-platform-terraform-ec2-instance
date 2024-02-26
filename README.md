@@ -44,7 +44,7 @@ module "ec2_test_instance" {
 }
 
 ```
-For a deployed example, please check [example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2.tf#L233)
+For a deployed example, please check [example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2.tf#L233). A second [fully self-contained example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2_complete.tf) has been added for ease of use.
 
 ### Setting backup tags
 Read [the Modernisation Platform backup functionality](https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/backups.html#backups) to understand how the backup plan works.
