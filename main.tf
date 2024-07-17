@@ -13,8 +13,18 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
+
+  user_data                   = <<-EOF
+    #!/bin/bash
+    ${length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered}
+    
+    # Install SSM Agent on Amazon Linux if not pre-installed
+    yum install -y amazon-ssm-agent
+    systemctl enable amazon-ssm-agent
+    systemctl start amazon-ssm-agent
+    EOF
+
 
   metadata_options {
     #checkov:skip=CKV_AWS_79:This isn't enabled in every environment, so we can't enforce it
@@ -91,6 +101,16 @@ resource "aws_instance" "this" {
   tags = merge(local.tags, var.instance.tags, {
     Name = var.name
   })
+   
+}
+
+#------------------------------------------------------------------------------
+# IAM Role Policy Attachment for SSM
+#------------------------------------------------------------------------------
+
+resource "aws_iam_role_policy_attachment" "ssm_role_policy_attachment" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 #------------------------------------------------------------------------------
