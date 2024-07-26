@@ -14,17 +14,7 @@ resource "aws_instance" "this" {
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
-
-  user_data                   = <<-EOF
-    #!/bin/bash
-    ${length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered}
-    
-    # Install SSM Agent on Amazon Linux if not pre-installed
-    yum install -y amazon-ssm-agent
-    systemctl enable amazon-ssm-agent
-    systemctl start amazon-ssm-agent
-    EOF
-
+  user_data                   = local.concatenated_userdata
 
   metadata_options {
     #checkov:skip=CKV_AWS_79:This isn't enabled in every environment, so we can't enforce it
@@ -101,16 +91,11 @@ resource "aws_instance" "this" {
   tags = merge(local.tags, var.instance.tags, {
     Name = var.name
   })
-   
 }
 
-#------------------------------------------------------------------------------
-# IAM Role Policy Attachment for SSM
-#------------------------------------------------------------------------------
-
-resource "aws_iam_role_policy_attachment" "ssm_role_policy_attachment" {
-  role       = aws_iam_role.this.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+locals {
+  # Read the content of the two shell scripts and concatenate them
+  concatenated_userdata = templatefile(format("%s%s", filebase64("${path.module}/scripts/ssm-user-data.sh"), length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered),{}) 
 }
 
 #------------------------------------------------------------------------------
@@ -360,7 +345,7 @@ resource "aws_iam_role" "this" {
     }
   )
 
-  managed_policy_arns = var.instance_profile_policies
+  managed_policy_arns = concat(["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"], var.instance_profile_policies)
 
   tags = merge(
     local.tags,

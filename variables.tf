@@ -168,6 +168,7 @@ variable "iam_resource_names_prefix" {
 variable "instance_profile_policies" {
   type        = list(string)
   description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+  default     = []
 }
 
 variable "ssm_parameters_prefix" {
