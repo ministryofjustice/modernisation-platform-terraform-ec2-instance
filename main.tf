@@ -340,14 +340,26 @@ resource "aws_iam_role" "this" {
     }
   )
 
-  managed_policy_arns = concat(["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"], var.instance_profile_policies)
-
   tags = merge(
     local.tags,
     {
       Name = "${var.iam_resource_names_prefix}-role-${var.name}"
     },
   )
+}
+
+# Attach SSM core policy
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Attach additional policies from variable
+resource "aws_iam_role_policy_attachment" "additional" {
+  count = length(var.instance_profile_policies)
+
+  role       = aws_iam_role.this.name
+  policy_arn = var.instance_profile_policies[count.index]
 }
 
 resource "aws_iam_role_policy" "ssm_params_and_secrets" {
