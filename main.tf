@@ -324,29 +324,34 @@ resource "aws_iam_role" "this" {
   name                 = "${var.iam_resource_names_prefix}-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
         }
-      ]
-    }
-  )
-
-  managed_policy_arns = concat(["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"], var.instance_profile_policies)
+        "Action" : "sts:AssumeRole",
+        "Condition" : {}
+      }
+    ]
+  })
 
   tags = merge(
     local.tags,
     {
       Name = "${var.iam_resource_names_prefix}-role-${var.name}"
     },
+  )
+}
+
+# Remove individual policy attachments and replace with exclusive management
+resource "aws_iam_role_policy_attachments_exclusive" "this" {
+  role_name = aws_iam_role.this.name
+  policy_arns = concat(
+    ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
+    var.instance_profile_policies
   )
 }
 
