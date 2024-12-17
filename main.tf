@@ -346,13 +346,11 @@ resource "aws_iam_role" "this" {
   )
 }
 
-# Remove individual policy attachments and replace with exclusive management
-resource "aws_iam_role_policy_attachments_exclusive" "this" {
-  role_name = aws_iam_role.this.name
-  policy_arns = concat(
-    ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"],
-    var.instance_profile_policies
-  )
+# IAM role policy attachment
+resource "aws_iam_role_policy_attachment" "this" {
+  count      = length(concat(["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"], var.instance_profile_policies))
+  role       = aws_iam_role.this.name
+  policy_arn = element(concat(["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"], var.instance_profile_policies), count.index)
 }
 
 resource "aws_iam_role_policy" "ssm_params_and_secrets" {
