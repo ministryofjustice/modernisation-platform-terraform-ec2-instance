@@ -231,3 +231,15 @@ variable "cloudwatch_metric_alarms" {
   }))
   default = {}
 }
+
+variable "skip_iam_role_policy_attachment" {
+  description = "If true, skip the IAM role policy attachment"
+  type        = bool
+  default     = false
+}
+
+variable "default_policy_arn" {
+  description = "Default policy ARN to attach"
+  type        = string
+  default     = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
