@@ -13,18 +13,19 @@ module "ec2_test_instance" {
 
   name = "${each.key}${random_id.test_id.hex}"
 
-  ami_name                      = each.value.ami_name
-  ami_owner                     = try(each.value.ami_owner, "core-shared-services-production")
-  instance                      = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
-  ebs_volumes_copy_all_from_ami = try(each.value.ebs_volumes_copy_all_from_ami, true)
-  ebs_volume_config             = lookup(each.value, "ebs_volume_config", {})
-  ebs_volumes                   = lookup(each.value, "ebs_volumes", {})
-  ebs_volume_tags               = lookup(each.value, "ebs_volume_tags", {})
-  secretsmanager_secrets_prefix = lookup(each.value, "secretsmanager_secrets_prefix", "test/")
-  secretsmanager_secrets        = lookup(each.value, "secretsmanager_secrets", null)
-  ssm_parameters_prefix         = lookup(each.value, "ssm_parameters_prefix", "test/")
-  ssm_parameters                = lookup(each.value, "ssm_parameters", null)
-  route53_records               = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
+  ami_name                            = each.value.ami_name
+  ami_owner                           = try(each.value.ami_owner, "core-shared-services-production")
+  instance                            = merge(local.ec2_test.instance, lookup(each.value, "instance", {}))
+  ebs_volumes_copy_all_from_ami       = try(each.value.ebs_volumes_copy_all_from_ami, true)
+  ebs_volume_config                   = lookup(each.value, "ebs_volume_config", {})
+  ebs_volumes                         = lookup(each.value, "ebs_volumes", {})
+  ebs_volume_tags                     = lookup(each.value, "ebs_volume_tags", {})
+  secretsmanager_secrets_prefix       = lookup(each.value, "secretsmanager_secrets_prefix", "test/")
+  secretsmanager_secrets              = lookup(each.value, "secretsmanager_secrets", null)
+  skip_ssm_iam_role_policy_attachment = true
+  ssm_parameters_prefix               = lookup(each.value, "ssm_parameters_prefix", "test/")
+  ssm_parameters                      = lookup(each.value, "ssm_parameters", null)
+  route53_records                     = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-test-instance${random_id.test_id.hex}"
   instance_profile_policies = local.ec2_common_managed_policies
