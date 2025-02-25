@@ -144,7 +144,17 @@ variable "ebs_volumes" {
     kms_key_id  = optional(string)
   }))
 }
+variable "skip_ssm_iam_role_policy_attachment" {
+  description = "If true, skip the IAM role policy attachment"
+  type        = bool
+  default     = false
+}
 
+variable "default_ssm_policy_arn" {
+  description = "Default SSM policy ARN to attach"
+  type        = string
+  default     = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 variable "ebs_volume_tags" {
   description = "Additional tags to apply to ebs volumes"
   type        = map(string)
