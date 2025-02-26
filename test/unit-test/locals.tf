@@ -94,6 +94,7 @@ locals {
         }
         ami_name  = "RHEL-7.9_HVM-*"
         ami_owner = "309956199498"
+        instance_profile_policies = []
       }
       example-test-instance-2 = {
         tags = {
