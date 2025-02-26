@@ -24,7 +24,6 @@ module "ec2_test_instance" {
   secretsmanager_secrets          = lookup(each.value, "secretsmanager_secrets", null)
   ssm_parameters_prefix           = lookup(each.value, "ssm_parameters_prefix", "test/")
   ssm_parameters                  = lookup(each.value, "ssm_parameters", null)
-  skip_iam_role_policy_attachment = false
   route53_records                 = merge(local.ec2_test.route53_records, lookup(each.value, "route53_records", {}))
 
   iam_resource_names_prefix = "ec2-test-instance${random_id.test_id.hex}"
