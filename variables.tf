@@ -231,3 +231,9 @@ variable "cloudwatch_metric_alarms" {
   }))
   default = {}
 }
+
+variable "default_policy_arn" {
+  description = "Default policy ARN to attach"
+  type        = string
+  default     = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
