@@ -92,8 +92,8 @@ locals {
         ebs_volume_tags = {
           backup = false
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name                  = "RHEL-7.9_HVM-*"
+        ami_owner                 = "309956199498"
         instance_profile_policies = []
       }
       example-test-instance-2 = {
@@ -163,4 +163,3 @@ resource "aws_key_pair" "ec2-terratest-user" {
     },
   )
 }
-
