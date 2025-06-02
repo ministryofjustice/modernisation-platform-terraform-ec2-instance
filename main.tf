@@ -348,9 +348,13 @@ resource "aws_iam_role" "this" {
 
 # IAM role policy attachment
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each   = toset(concat([var.default_policy_arn], coalesce(var.instance_profile_policies, [])))
+  for_each = {
+    for idx, policy_arn in concat([var.default_policy_arn], coalesce(var.instance_profile_policies, [])) :
+    idx => policy_arn
+  }
+
   role       = aws_iam_role.this.name
-  policy_arn = each.key
+  policy_arn = each.value
 }
 
 resource "aws_iam_role_policy" "ssm_params_and_secrets" {
