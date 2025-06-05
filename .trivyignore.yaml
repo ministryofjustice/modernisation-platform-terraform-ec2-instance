@@ -41,11 +41,11 @@ misconfigurations:
   - id: AVD-AWS-0057
   - id: AVD-AWS-0104
     paths:
-      - "./test/unit-test/security-groups.tf"
+      - "security-groups.tf"
     statement: Accept the risk - Test SG
   - id: AVD-AWS-0107
     paths:
-      - "./test/unit-test/security-groups.tf"
+      - "security-groups.tf"
     statement: Accept the risk - Test SG
 
 secrets:
