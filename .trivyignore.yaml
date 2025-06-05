@@ -39,6 +39,14 @@ misconfigurations:
   - id: AVD-AWS-0031
   - id: AVD-AWS-0039
   - id: AVD-AWS-0057
+  - id: AVD-AWS-0104
+    paths:
+      - "test/unit-test/security-groups.tf"
+    statement: Security group for testing only, not for production use
+  - id: AVD-AWS-0107
+    paths:
+      - "test/unit-test/security-groups.tf"
+    statement: Security group for testing only, not for production use
 
 secrets:
 
