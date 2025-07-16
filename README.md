@@ -44,34 +44,41 @@ module "ec2_test_instance" {
 }
 
 ```
+
 For a deployed example, please check [example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2.tf#L233). A second [fully self-contained example](https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/terraform/environments/example/ec2_complete.tf) has been added for ease of use.
 
 ### Setting backup tags
+
 Read [the Modernisation Platform backup functionality](https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/backups.html#backups) to understand how the backup plan works.
 The following is a summary of the backup behaviour based on the tags that are set and passed in this module.
 
 #### Production environment
+
 By default, all production resources (EC2 and EBS) will be backed up. This is determined by the `is-production` tag being set to `true`.
 Production backups can be skipped by setting `backup` tag to `false` (passed in `tags` input).
 
 #### Non-production environments
+
 Additionally, you are able to control backups in non-production environments by setting `backup` tag to `true` (passed in `tags` input).
 
 #### Backup duplication problem
+
 NOTE, setting `backup` tag to `true` that is passed in `tags` input will set `backup` tag to `true` on all EC2 and EBS resources.
 This will result in duplicated backups as EBS resources that are part of an EC2 will get backed up during the EC2 backup and EBS backup selection by the backup plan.
 
 In order to select either EC2 backups or EBS backups it is possible to set `backup` tag to `true` on only EC2 instance, by passing the tag as part of the `instance.tags` input or setting the `backup` tag to `true` on only EBS by setting the `backup` tag to `true` and passing it in the `ebs_volume_tags` input.
 NOTE, if the `backup` tag is passed in `tags` and `instance.tags`/`ebs_volume_tags`, the tag set on the specific resources will take priority.
 For example, `backup` tag is set to:
-* `true` via `tags` input
-* `false` via `instance.tags` input
-* `true` via `ebs_volume_tags` input
-will result in:
-* EC2 not being backed up
-* all EBS being backed up (that includes root ebs, inline ebs and attached ebs).
+
+- `true` via `tags` input
+- `false` via `instance.tags` input
+- `true` via `ebs_volume_tags` input
+  will result in:
+- EC2 not being backed up
+- all EBS being backed up (that includes root ebs, inline ebs and attached ebs).
 
 ## Looking for issues?
+
 If you're looking to raise an issue with this module, please create a new issue in the [Modernisation Platform repository](https://github.com/ministryofjustice/modernisation-platform/issues).
 
 <!-- BEGIN_TF_DOCS -->
@@ -79,19 +86,19 @@ If you're looking to raise an issue with this module, please create a new issue 
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1.7 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 5.0 |
-| <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | ~> 2.3.5 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | ~> 1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 6.0 |
+| <a name="requirement_cloudinit"></a> [cloudinit](#requirement\_cloudinit) | ~> 2.3 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
-| <a name="requirement_time"></a> [time](#requirement\_time) | > 0.9.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.13 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 5.0 |
-| <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 5.0 |
-| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | ~> 2.3.5 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 6.0 |
+| <a name="provider_aws.core-vpc"></a> [aws.core-vpc](#provider\_aws.core-vpc) | ~> 6.0 |
+| <a name="provider_cloudinit"></a> [cloudinit](#provider\_cloudinit) | ~> 2.3 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.0 |
 
 ## Modules

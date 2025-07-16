@@ -146,4 +146,3 @@ locals {
     try(length(var.user_data_cloud_init.write_files), 0)
   ]
 }
-
