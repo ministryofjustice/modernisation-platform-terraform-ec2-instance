@@ -244,7 +244,7 @@ resource "random_password" "secrets" {
 }
 
 resource "aws_secretsmanager_secret" "fixed" {
-  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
+  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
   #checkov:skip=CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = merge(
     local.secretsmanager_secrets_value,
