@@ -13,8 +13,8 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
-  user_data                   = var.user_data_raw
-  user_data_base64            = length(data.cloudinit_config.this) != 0 ? data.cloudinit_config.this[0].rendered : null
+  user_data                   = length(data.cloudinit_config.this) == 0 ? var.user_data : data.cloudinit_config.this[0]
+  user_data_base64            = var.user_data_raw
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   metadata_options {
@@ -84,6 +84,7 @@ resource "aws_instance" "this" {
   lifecycle {
     ignore_changes = [
       user_data,                  # Prevent changes to user_data from destroying existing EC2s
+      user_data_base64,           # Prevent changes to user_data from destroying existing EC2s
       ebs_block_device,           # Otherwise EC2 will be refreshed each time
       associate_public_ip_address # The state erroneously has this set to true after an EC2 is restarted with EIP attached
     ]
