@@ -13,8 +13,8 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? var.user_data : data.cloudinit_config.this[0]
-  user_data_base64            = var.user_data_raw
+  user_data                   = var.user_data
+  user_data_base64            = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   metadata_options {
