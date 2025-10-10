@@ -13,7 +13,8 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
+  user_data                   = var.user_data
+  user_data_base64            = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   metadata_options {
@@ -83,6 +84,7 @@ resource "aws_instance" "this" {
   lifecycle {
     ignore_changes = [
       user_data,                  # Prevent changes to user_data from destroying existing EC2s
+      user_data_base64,           # Prevent changes to user_data from destroying existing EC2s
       ebs_block_device,           # Otherwise EC2 will be refreshed each time
       associate_public_ip_address # The state erroneously has this set to true after an EC2 is restarted with EIP attached
     ]
@@ -242,7 +244,7 @@ resource "random_password" "secrets" {
 }
 
 resource "aws_secretsmanager_secret" "fixed" {
-  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
+  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
   #checkov:skip=CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = merge(
     local.secretsmanager_secrets_value,

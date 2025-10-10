@@ -89,6 +89,12 @@ variable "instance" {
   })
 }
 
+variable "user_data" {
+  description = "User data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see user_data_raw instead"
+  type        = string
+  default     = null
+}
+
 variable "user_data_raw" {
   description = "Base64 encoded user data, script or cloud formation template"
   type        = string
