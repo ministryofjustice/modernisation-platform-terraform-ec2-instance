@@ -166,6 +166,7 @@ No modules.
 | <a name="input_ssm_parameters_prefix"></a> [ssm\_parameters\_prefix](#input\_ssm\_parameters\_prefix) | Optionally prefix ssm parameters with this prefix.  Add a trailing / | `string` | `""` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | The subnet id in which to deploy the infrastructure | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Default tags to be applied to resources.  Additional tags can be added to EBS volumes or EC2s, see instance.tags and ebs\_volume\_tags variables. | `map(any)` | n/a | yes |
+| <a name="input_user_data"></a> [user\_data](#input\_user\_data) | User data to provide when launching the instance. Do not pass gzip-compressed data via this argument; see user\_data\_raw instead | `string` | `null` | no |
 | <a name="input_user_data_cloud_init"></a> [user\_data\_cloud\_init](#input\_user\_data\_cloud\_init) | Use this instead of user\_data\_raw to run multiple scripts using cloud\_init | <pre>object({<br/>    args    = optional(map(string))<br/>    scripts = optional(list(string))<br/>    write_files = optional(map(object({<br/>      path        = string<br/>      owner       = string<br/>      permissions = string<br/>    })), {})<br/>  })</pre> | `null` | no |
 | <a name="input_user_data_raw"></a> [user\_data\_raw](#input\_user\_data\_raw) | Base64 encoded user data, script or cloud formation template | `string` | `null` | no |
 
