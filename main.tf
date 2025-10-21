@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_instance" "this" {
-  ami                         = data.aws_ami.this.id
+  ami                         = coalesce(var.ami_id, data.aws_ami.this[0].id)
   associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
   disable_api_stop            = var.instance.disable_api_stop
@@ -33,7 +33,7 @@ resource "aws_instance" "this" {
     volume_type           = local.ebs_volume_root.type
 
     tags = merge(local.tags, var.ebs_volume_tags, {
-      Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
+      Name = join("-", [var.name, "root", local.ebs_volume_root_name])
     })
   }
 

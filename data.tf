@@ -1,6 +1,8 @@
 data "aws_caller_identity" "current" {}
 
 data "aws_ami" "this" {
+  count = var.ami_name != null ? 1 : 0
+
   most_recent = true
   owners      = [try(var.account_ids_lookup[var.ami_owner], var.ami_owner)]
   tags = {
