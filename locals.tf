@@ -47,11 +47,11 @@ locals {
     key => value if value.value == null && value.random == null
   }
 
-  ami_block_device_mappings = len(data.aws_ami.this) == 0 ? {} : {
+  ami_block_device_mappings = length(data.aws_ami.this) == 0 ? {} : {
     for bdm in data.aws_ami.this[0].block_device_mappings : bdm.device_name => bdm
   }
 
-  ami_block_device_mappings_nonroot = len(data.aws_ami.this) == 0 ? {} : {
+  ami_block_device_mappings_nonroot = length(data.aws_ami.this) == 0 ? {} : {
     for key, value in local.ami_block_device_mappings :
     key => value if key != local.ebs_volume_root_name
   }
