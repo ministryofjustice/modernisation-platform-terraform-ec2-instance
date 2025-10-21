@@ -53,7 +53,7 @@ variable "account_ids_lookup" {
 
 variable "ami_name" {
   type        = string
-  description = "Name of AMI. EBS volumes copied automatically from AMI. Or set to null and use ami_id, ebs_volumes and ebs_volume_root_name"
+  description = "Name of AMI. EBS volumes copied automatically from AMI. Or set to null and use instance.ami, ebs_volumes and ebs_volume_root_name"
 }
 
 variable "ami_owner" {
@@ -61,12 +61,6 @@ variable "ami_owner" {
   description = "Account name or id where ami_name is found. Only set if AMI is in a different account."
   default     = "self"
   nullable    = false
-}
-
-variable "ami_id" {
-  type        = string
-  description = "ID of AMI. Use this option along with ebs_volumes and ebs_volume_root_name if original AMI has been deleted"
-  default     = null
 }
 
 variable "name" {
@@ -78,6 +72,7 @@ variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
     associate_public_ip_address  = optional(bool, false)
+    ami                          = optional(string) # use ami_name instead unless ami has been deleted
     disable_api_termination      = optional(bool)
     disable_api_stop             = optional(bool)
     instance_type                = string
