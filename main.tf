@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_instance" "this" {
-  ami                         = coalesce(var.instance.ami, data.aws_ami.this[0].id)
+  ami                         = var.instance.ami != null ? var.instance.ami : data.aws_ami.this[0].id
   associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
   disable_api_stop            = var.instance.disable_api_stop
