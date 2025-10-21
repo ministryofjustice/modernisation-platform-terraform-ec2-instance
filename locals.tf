@@ -123,7 +123,7 @@ locals {
     )
   }
 
-  ebs_volume_root_name = coalesce(var.ebs_volume_root_name, data.aws_ami.this[0].root_device_name)
+  ebs_volume_root_name = var.ebs_volume_root_name != null ? var.ebs_volume_root_name : data.aws_ami.this[0].root_device_name
 
   ebs_volume_root = local.ebs_volumes[local.ebs_volume_root_name]
 
