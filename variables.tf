@@ -42,6 +42,7 @@ variable "subnet_id" {
 variable "tags" {
   type        = map(any)
   description = "Default tags to be applied to resources.  Additional tags can be added to EBS volumes or EC2s, see instance.tags and ebs_volume_tags variables."
+  default     = {}
 }
 
 variable "account_ids_lookup" {
@@ -52,12 +53,12 @@ variable "account_ids_lookup" {
 
 variable "ami_name" {
   type        = string
-  description = "Name of AMI to be used to launch the database ec2 instance"
+  description = "Name of AMI. EBS volumes copied automatically from AMI. Or set to null and use instance.ami, ebs_volumes and ebs_volume_root_name"
 }
 
 variable "ami_owner" {
   type        = string
-  description = "Owner of AMI to be used to launch the database ec2 instance"
+  description = "Account name or id where ami_name is found. Only set if AMI is in a different account."
   default     = "self"
   nullable    = false
 }
@@ -71,15 +72,16 @@ variable "instance" {
   description = "EC2 instance settings, see aws_instance documentation"
   type = object({
     associate_public_ip_address  = optional(bool, false)
-    disable_api_termination      = bool
-    disable_api_stop             = bool
+    ami                          = optional(string) # use ami_name instead unless ami has been deleted
+    disable_api_termination      = optional(bool)
+    disable_api_stop             = optional(bool)
     instance_type                = string
-    key_name                     = string
+    key_name                     = optional(string)
     metadata_endpoint_enabled    = optional(string, "enabled")
     metadata_options_http_tokens = optional(string, "required")
     monitoring                   = optional(bool, true)
     ebs_block_device_inline      = optional(bool, false)
-    vpc_security_group_ids       = list(string)
+    vpc_security_group_ids       = optional(list(string))
     private_dns_name_options = optional(object({
       enable_resource_name_dns_aaaa_record = optional(bool)
       enable_resource_name_dns_a_record    = optional(bool)
@@ -136,6 +138,13 @@ variable "ebs_volume_config" {
     type       = optional(string)
     kms_key_id = optional(string)
   }))
+  default = {}
+}
+
+variable "ebs_volume_root_name" {
+  description = "The name of the root volume. Normally derived from AMI but set this if the original AMI is missing"
+  type        = string
+  default     = null
 }
 
 variable "ebs_volumes" {
@@ -149,6 +158,7 @@ variable "ebs_volumes" {
     type        = optional(string)
     kms_key_id  = optional(string)
   }))
+  default = {}
 }
 
 variable "ebs_volume_tags" {
@@ -163,6 +173,10 @@ variable "route53_records" {
     create_internal_record = bool
     create_external_record = bool
   })
+  default = {
+    create_internal_record = false
+    create_external_record = false
+  }
 }
 
 variable "iam_resource_names_prefix" {
@@ -173,7 +187,8 @@ variable "iam_resource_names_prefix" {
 
 variable "instance_profile_policies" {
   type        = list(string)
-  description = "A list of managed IAM policy document ARNs to be attached to the database instance profile"
+  description = "A list of any additional policies to attach to the instance profile above what's set in default_policy_arn"
+  default     = []
 }
 
 variable "ssm_parameters_prefix" {

@@ -47,13 +47,13 @@ locals {
     key => value if value.value == null && value.random == null
   }
 
-  ami_block_device_mappings = {
-    for bdm in data.aws_ami.this.block_device_mappings : bdm.device_name => bdm
+  ami_block_device_mappings = length(data.aws_ami.this) == 0 ? {} : {
+    for bdm in data.aws_ami.this[0].block_device_mappings : bdm.device_name => bdm
   }
 
-  ami_block_device_mappings_nonroot = {
+  ami_block_device_mappings_nonroot = length(data.aws_ami.this) == 0 ? {} : {
     for key, value in local.ami_block_device_mappings :
-    key => value if key != data.aws_ami.this.root_device_name
+    key => value if key != local.ebs_volume_root_name
   }
 
   ebs_volumes_from_ami = {
@@ -123,11 +123,13 @@ locals {
     )
   }
 
-  ebs_volume_root = local.ebs_volumes[data.aws_ami.this.root_device_name]
+  ebs_volume_root_name = var.ebs_volume_root_name != null ? var.ebs_volume_root_name : data.aws_ami.this[0].root_device_name
+
+  ebs_volume_root = local.ebs_volumes[local.ebs_volume_root_name]
 
   ebs_volumes_nonroot = {
     for key, value in local.ebs_volumes :
-    key => value if key != data.aws_ami.this.root_device_name
+    key => value if key != local.ebs_volume_root_name
   }
 
   user_data_args_ssm_params = {
