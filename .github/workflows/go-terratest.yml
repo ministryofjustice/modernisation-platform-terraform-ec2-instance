@@ -44,6 +44,7 @@ jobs:
           echo "::add-mask::${AWS_SECRET_KEY}"
           echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}" >> $GITHUB_ENV
           echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}" >> $GITHUB_ENV
+          rm -f keys.json 
 
 
       - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
