@@ -3,7 +3,7 @@
 #------------------------------------------------------------------------------
 
 resource "aws_instance" "this" {
-  ami                         = data.aws_ami.this.id
+  ami                         = var.instance.ami != null ? var.instance.ami : data.aws_ami.this[0].id
   associate_public_ip_address = false # create an EIP instead
   disable_api_termination     = var.instance.disable_api_termination
   disable_api_stop            = var.instance.disable_api_stop
@@ -13,7 +13,8 @@ resource "aws_instance" "this" {
   key_name                    = var.instance.key_name
   monitoring                  = coalesce(var.instance.monitoring, true)
   subnet_id                   = var.subnet_id
-  user_data                   = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
+  user_data                   = var.user_data
+  user_data_base64            = length(data.cloudinit_config.this) == 0 ? var.user_data_raw : data.cloudinit_config.this[0].rendered
   vpc_security_group_ids      = var.instance.vpc_security_group_ids
 
   metadata_options {
@@ -32,7 +33,7 @@ resource "aws_instance" "this" {
     volume_type           = local.ebs_volume_root.type
 
     tags = merge(local.tags, var.ebs_volume_tags, {
-      Name = join("-", [var.name, "root", data.aws_ami.this.root_device_name])
+      Name = join("-", [var.name, "root", local.ebs_volume_root_name])
     })
   }
 
@@ -83,6 +84,7 @@ resource "aws_instance" "this" {
   lifecycle {
     ignore_changes = [
       user_data,                  # Prevent changes to user_data from destroying existing EC2s
+      user_data_base64,           # Prevent changes to user_data from destroying existing EC2s
       ebs_block_device,           # Otherwise EC2 will be refreshed each time
       associate_public_ip_address # The state erroneously has this set to true after an EC2 is restarted with EIP attached
     ]
@@ -242,7 +244,7 @@ resource "random_password" "secrets" {
 }
 
 resource "aws_secretsmanager_secret" "fixed" {
-  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
+  # skipped check as the secret value is defined by terraform so cannot be rotated by AWS
   #checkov:skip=CKV2_AWS_57: Ensure Secrets Manager secrets should have automatic rotation enabled
   for_each = merge(
     local.secretsmanager_secrets_value,
@@ -324,23 +326,19 @@ resource "aws_iam_role" "this" {
   name                 = "${var.iam_resource_names_prefix}-role-${var.name}"
   path                 = "/"
   max_session_duration = "3600"
-  assume_role_policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-        {
-          "Effect" : "Allow",
-          "Principal" : {
-            "Service" : "ec2.amazonaws.com"
-          }
-          "Action" : "sts:AssumeRole",
-          "Condition" : {}
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
         }
-      ]
-    }
-  )
-
-  managed_policy_arns = var.instance_profile_policies
+        "Action" : "sts:AssumeRole",
+        "Condition" : {}
+      }
+    ]
+  })
 
   tags = merge(
     local.tags,
@@ -348,6 +346,17 @@ resource "aws_iam_role" "this" {
       Name = "${var.iam_resource_names_prefix}-role-${var.name}"
     },
   )
+}
+
+# IAM role policy attachment
+resource "aws_iam_role_policy_attachment" "this" {
+  for_each = {
+    for idx, policy_arn in concat([var.default_policy_arn], coalesce(var.instance_profile_policies, [])) :
+    idx => policy_arn
+  }
+
+  role       = aws_iam_role.this.name
+  policy_arn = each.value
 }
 
 resource "aws_iam_role_policy" "ssm_params_and_secrets" {
@@ -375,6 +384,7 @@ resource "aws_cloudwatch_metric_alarm" "this" {
   statistic           = each.value.statistic
   threshold           = each.value.threshold
   alarm_actions       = each.value.alarm_actions
+  ok_actions          = each.value.ok_actions
   alarm_description   = each.value.alarm_description
   datapoints_to_alarm = each.value.datapoints_to_alarm
   treat_missing_data  = each.value.treat_missing_data

@@ -3,7 +3,7 @@ locals {
 
   # create list of common managed policies that can be attached to ec2 instance profiles
   ec2_common_managed_policies = [
-    aws_iam_policy.ec2_test_common_policy.arn
+    aws_iam_policy.ec2_test_common_policy.arn,
   ]
 
   tags = {
@@ -92,8 +92,9 @@ locals {
         ebs_volume_tags = {
           backup = false
         }
-        ami_name  = "RHEL-7.9_HVM-*"
-        ami_owner = "309956199498"
+        ami_name                  = "RHEL-7.9_HVM-*"
+        ami_owner                 = "309956199498"
+        instance_profile_policies = []
       }
       example-test-instance-2 = {
         tags = {
@@ -162,4 +163,3 @@ resource "aws_key_pair" "ec2-terratest-user" {
     },
   )
 }
-

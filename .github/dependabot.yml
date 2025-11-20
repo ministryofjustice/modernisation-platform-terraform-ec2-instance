@@ -1,10 +1,22 @@
 version: 2
 updates:
   - package-ecosystem: "terraform"
-    directory: "/terraform"
+    directory: "/"
     schedule:
       interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    groups:
+      action-dependencies:
+        patterns:
+          - "*"
+  - package-ecosystem: "gomod"
+    directory: "/test"
+    schedule:
+      interval: "daily"
+    groups:
+      gomod-dependencies:
+        patterns:
+          - "*"

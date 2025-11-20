@@ -13,17 +13,26 @@ permissions: {}
 jobs:
   docs:
     permissions:
+      pull-requests: write
       contents: write
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       with:
         ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Render terraform docs and push changes back to PR
-      uses: terraform-docs/gh-actions@62a6cc597a9a2ee6953471d4c9cc1668c66ebf36 # v1.0.0
+      uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
       with:
         working-dir: .
         output-file: README.md
         output-method: inject
-        git-push: "true"
+        git-push: "false"
+
+    - name: Fix Git permissions
+      run: sudo chown -R $(whoami) .git/
+
+    - name: Run Signed Commit Action
+      uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}

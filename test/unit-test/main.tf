@@ -39,4 +39,3 @@ module "ec2_test_instance" {
   account_ids_lookup       = local.environment_management.account_ids
   cloudwatch_metric_alarms = {}
 }
-
