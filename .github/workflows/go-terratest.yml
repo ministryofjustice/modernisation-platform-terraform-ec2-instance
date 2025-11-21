@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4eceb2a416a197e91dc557c2ef0b5dd9afe29e0c # v3.4.6
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@6c97ed22b51b7ee814db41756fb209c15f60373c # v3.4.7
     permissions:
       id-token: write
       contents: read
@@ -30,18 +30,11 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@6c97ed22b51b7ee814db41756fb209c15f60373c # v3.4.7
         with:
           testing_ci_iam_user_access_key_id: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_access_key_id }}
           testing_ci_iam_user_secret_access_key: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_secret_access_key }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-
-      - name: Export Testing_CI credentials
-        run: |
-          echo "::add-mask::${TESTING_CI_IAM_USER_ACCESS_KEY_ID}"
-          echo "::add-mask::${TESTING_CI_IAM_USER_SECRET_ACCESS_KEY}"
-          echo "AWS_ACCESS_KEY_ID=${TESTING_CI_IAM_USER_ACCESS_KEY_ID}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${TESTING_CI_IAM_USER_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
 
       - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
@@ -60,4 +53,3 @@ jobs:
           chmod 700 ../scripts/redact-output.sh
           go test -v | ../scripts/redact-output.sh
           exit ${PIPESTATUS[0]}
-          
