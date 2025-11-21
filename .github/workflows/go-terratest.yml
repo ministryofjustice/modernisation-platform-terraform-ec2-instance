@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@6c97ed22b51b7ee814db41756fb209c15f60373c # v3.4.7
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@4247a6dc9c1d9f0f0c155cd2778480381507d7f0 # v3.4.7
     permissions:
       id-token: write
       contents: read
@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@6c97ed22b51b7ee814db41756fb209c15f60373c # v3.4.7
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@4247a6dc9c1d9f0f0c155cd2778480381507d7f0 # v3.4.7
         with:
           testing_ci_iam_user_access_key_id: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_access_key_id }}
           testing_ci_iam_user_secret_access_key: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_secret_access_key }}
