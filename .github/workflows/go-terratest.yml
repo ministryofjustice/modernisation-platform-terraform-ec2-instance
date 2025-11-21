@@ -1,4 +1,3 @@
-
 on:
   pull_request:
     types: [opened, edited, reopened, synchronize]
@@ -33,19 +32,16 @@ jobs:
       - name: Decrypt Secrets
         uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
         with:
-          testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
+          testing_ci_iam_user_access_key_id: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_access_key_id }}
+          testing_ci_iam_user_secret_access_key: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_secret_access_key }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
-      - name: Export Testing_CI credentials from JSON
+      - name: Export Testing_CI credentials
         run: |
-          AWS_ACCESS_KEY=$(echo "${TESTING_CI_IAM_USER_KEYS}" | jq -r '.AWS_ACCESS_KEY_ID')
-          AWS_SECRET_KEY=$(echo "${TESTING_CI_IAM_USER_KEYS}" | jq -r '.AWS_SECRET_ACCESS_KEY')
-          echo "::add-mask::${AWS_ACCESS_KEY}"
-          echo "::add-mask::${AWS_SECRET_KEY}"
-          echo "AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_KEY}" >> $GITHUB_ENV
-          rm -f keys.json 
-
+          echo "::add-mask::${TESTING_CI_IAM_USER_ACCESS_KEY_ID}"
+          echo "::add-mask::${TESTING_CI_IAM_USER_SECRET_ACCESS_KEY}"
+          echo "AWS_ACCESS_KEY_ID=${TESTING_CI_IAM_USER_ACCESS_KEY_ID}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${TESTING_CI_IAM_USER_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
 
       - uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c # v6.1.0
         with:
@@ -64,3 +60,4 @@ jobs:
           chmod 700 ../scripts/redact-output.sh
           go test -v | ../scripts/redact-output.sh
           exit ${PIPESTATUS[0]}
+          
