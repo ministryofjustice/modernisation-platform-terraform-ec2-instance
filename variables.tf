@@ -75,6 +75,7 @@ variable "instance" {
     ami                          = optional(string) # use ami_name instead unless ami has been deleted
     disable_api_termination      = optional(bool)
     disable_api_stop             = optional(bool)
+    ebs_optimized                = optional(bool)
     instance_type                = string
     key_name                     = optional(string)
     metadata_endpoint_enabled    = optional(string, "enabled")
