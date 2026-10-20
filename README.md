@@ -1,6 +1,6 @@
 # Modernisation Platform Terraform EC2 Instance
 
-[![Standards Icon]][Standards Link] [![Format Code Icon]][Format Code Link] [![Scorecards Icon]][Scorecards Link] [![SCA Icon]][SCA Link] [![Terraform SCA Icon]][Terraform SCA Link]
+[![Standards Icon]][Standards Link] [![Scorecards Icon]][Scorecards Link] [![Code Quality Icon]][Code Quality Link]
 
 ## Usage
 
@@ -158,7 +158,7 @@ No modules.
 | <a name="input_ebs_volumes_copy_all_from_ami"></a> [ebs\_volumes\_copy\_all\_from\_ami](#input\_ebs\_volumes\_copy\_all\_from\_ami) | If true, ensure all volumes in AMI are also present in EC2.  If false, only create volumes specified in ebs\_volumes var | `bool` | `true` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Application environment - i.e. the terraform workspace | `string` | n/a | yes |
 | <a name="input_iam_resource_names_prefix"></a> [iam\_resource\_names\_prefix](#input\_iam\_resource\_names\_prefix) | Prefix IAM resources with this prefix, e.g. ec2-database | `string` | `"ec2"` | no |
-| <a name="input_instance"></a> [instance](#input\_instance) | EC2 instance settings, see aws\_instance documentation | <pre>object({<br/>    associate_public_ip_address  = optional(bool, false)<br/>    ami                          = optional(string) # use ami_name instead unless ami has been deleted<br/>    disable_api_termination      = optional(bool)<br/>    disable_api_stop             = optional(bool)<br/>    instance_type                = string<br/>    key_name                     = optional(string)<br/>    metadata_endpoint_enabled    = optional(string, "enabled")<br/>    metadata_options_http_tokens = optional(string, "required")<br/>    monitoring                   = optional(bool, true)<br/>    ebs_block_device_inline      = optional(bool, false)<br/>    vpc_security_group_ids       = optional(list(string))<br/>    private_dns_name_options = optional(object({<br/>      enable_resource_name_dns_aaaa_record = optional(bool)<br/>      enable_resource_name_dns_a_record    = optional(bool)<br/>      hostname_type                        = string<br/>    }))<br/>    tags = optional(map(string), {})<br/>  })</pre> | n/a | yes |
+| <a name="input_instance"></a> [instance](#input\_instance) | EC2 instance settings, see aws\_instance documentation | <pre>object({<br/>    associate_public_ip_address  = optional(bool, false)<br/>    ami                          = optional(string) # use ami_name instead unless ami has been deleted<br/>    disable_api_termination      = optional(bool)<br/>    disable_api_stop             = optional(bool)<br/>    ebs_optimized                = optional(bool)<br/>    instance_type                = string<br/>    key_name                     = optional(string)<br/>    metadata_endpoint_enabled    = optional(string, "enabled")<br/>    metadata_options_http_tokens = optional(string, "required")<br/>    monitoring                   = optional(bool, true)<br/>    ebs_block_device_inline      = optional(bool, false)<br/>    vpc_security_group_ids       = optional(list(string))<br/>    private_dns_name_options = optional(object({<br/>      enable_resource_name_dns_aaaa_record = optional(bool)<br/>      enable_resource_name_dns_a_record    = optional(bool)<br/>      hostname_type                        = string<br/>    }))<br/>    tags = optional(map(string), {})<br/>  })</pre> | n/a | yes |
 | <a name="input_instance_profile_policies"></a> [instance\_profile\_policies](#input\_instance\_profile\_policies) | A list of any additional policies to attach to the instance profile above what's set in default\_policy\_arn | `list(string)` | `[]` | no |
 | <a name="input_name"></a> [name](#input\_name) | Provide a unique name for the instance | `string` | n/a | yes |
 | <a name="input_region"></a> [region](#input\_region) | Destination AWS Region for the infrastructure | `string` | `"eu-west-2"` | no |
@@ -183,11 +183,7 @@ No modules.
 
 [Standards Link]: https://github-community.service.justice.gov.uk/repository-standards/modernisation-platform-terraform-ec2-instance "Repo standards badge."
 [Standards Icon]: https://github-community.service.justice.gov.uk/repository-standards/api/modernisation-platform-terraform-ec2-instance/badge
-[Format Code Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-terraform-ec2-instance/format-code.yml?labelColor=231f20&style=for-the-badge&label=Formate%20Code
-[Format Code Link]: https://github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance/actions/workflows/format-code.yml
 [Scorecards Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-terraform-ec2-instance/scorecards.yml?branch=main&labelColor=231f20&style=for-the-badge&label=Scorecards
 [Scorecards Link]: https://github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance/actions/workflows/scorecards.yml
-[SCA Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-terraform-ec2-instance/code-scanning.yml?branch=main&labelColor=231f20&style=for-the-badge&label=Secure%20Code%20Analysis
-[SCA Link]: https://github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance/actions/workflows/code-scanning.yml
-[Terraform SCA Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-terraform-ec2-instance/code-scanning.yml?branch=main&labelColor=231f20&style=for-the-badge&label=Terraform%20Static%20Code%20Analysis
-[Terraform SCA Link]: https://github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance/actions/workflows/terraform-static-analysis.yml
+[Code Quality Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-terraform-ec2-instance/code-quality.yml?branch=main&labelColor=231f20&style=for-the-badge&label=Code%20Quality
+[Code Quality Link]: https://github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance/actions/workflows/code-quality.yml
